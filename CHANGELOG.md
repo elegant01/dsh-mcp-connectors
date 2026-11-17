@@ -4,6 +4,15 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-17
+
+### Changed
+
+- Bilingual README (English + 简体中文) with light/dark screenshots.
+- Added `CHANGELOG.md` / `CHANGELOG.zh-CN.md`.
+- Added GitHub Actions: `ci.yml` (typecheck + full regression on push/PR) and `publish.yml` (publishes to npm when a `v*` tag is pushed, with provenance).
+- Package name is `dsh-mcp-connectors` (the original `dsh-mcp-manager` is taken on npm).
+
 ## [0.1.0] - 2026-11-17
 
 First public release.

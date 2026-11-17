@@ -4,6 +4,15 @@
 
 ## [未发布]
 
+## [0.1.1] - 2026-11-17
+
+### 变更
+
+- 补齐中英双语 README（含明暗两套截图）。
+- 新增 `CHANGELOG.md` / `CHANGELOG.zh-CN.md`。
+- 新增 GitHub Actions：`ci.yml`（push/PR 跑类型检查与全量回归）、`publish.yml`（推 `v*` 标签自动发布 npm，带 provenance）。
+- 包名确定为 `dsh-mcp-connectors`（原名 `dsh-mcp-manager` 在 npm 上已被占用）。
+
 ## [0.1.0] - 2026-11-17
 
 首个公开版本。
