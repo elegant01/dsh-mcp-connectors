@@ -1,0 +1,3 @@
+node_modules/
+*.tgz
+.dsh-mcp-connectors-build-*

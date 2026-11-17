@@ -1,0 +1,83 @@
+{
+  "name": "dsh-mcp-connectors",
+  "version": "0.1.0",
+  "description": "DSH MCP Manager — 在 DeepSeek Harness 中统一管理本机各 Agent 的 MCP 服务器 · Manage MCP servers across local AI agents in DSH",
+  "license": "Apache-2.0",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json",
+    "./icon": "./assets/icon.svg",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "locale",
+    "lib",
+    "assets",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "dsh": {
+    "manifestVersion": 1,
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-primitives"
+      ],
+      "platform": "web"
+    }
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "prepack": "npm run typecheck && npm run build"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "@types/react": "18.3.31",
+    "@types/react-dom": "18.3.7",
+    "esbuild": "0.25.0",
+    "react": "^18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "5.9.3"
+  },
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0",
+    "dsh": ">=0.2.0-rc.1 <0.3.0-0"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "mcp",
+    "mcp-server",
+    "agent",
+    "model-context-protocol"
+  ],
+  "icon": "./assets/icon.svg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elegant01/dsh-mcp-connectors.git"
+  },
+  "bugs": {
+    "url": "https://github.com/elegant01/dsh-mcp-connectors/issues"
+  },
+  "homepage": "https://github.com/elegant01/dsh-mcp-connectors#readme",
+  "author": {
+    "name": "elegant01"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/",
+    "access": "public"
+  }
+}
