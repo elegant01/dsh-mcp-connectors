@@ -36,7 +36,7 @@ interface ClientContext { slots?: SlotsService; locale?: LocaleService; }
 
 // ---------- 词典 ----------
 type Dict = Record<string, string>;
-const ZH: Dict = {
+export const ZH: Dict = {
   title: "连接器",
   subtitle: "统一管理本机各 Agent 的 MCP 服务器配置",
   brandSub: "跨 Agent 配置中心",
@@ -373,7 +373,7 @@ type ModalState =
 interface Toast { id: number; text: string; err?: boolean; }
 
 // ---------- 主组件 ----------
-function McpManagerApp(props: { t: (k: string) => string }) {
+export function McpManagerApp(props: { t: (k: string) => string }) {
   const { t } = props;
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);

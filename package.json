@@ -17,7 +17,10 @@
     "lib",
     "assets",
     "cordis.patch.yml",
-    "README.md"
+    "CHANGELOG.md",
+    "CHANGELOG.zh-CN.md",
+    "README.md",
+    "README.zh-CN.md"
   ],
   "dsh": {
     "manifestVersion": 1,
@@ -36,7 +39,10 @@
   "scripts": {
     "build": "node scripts/build.mjs",
     "typecheck": "tsc --noEmit",
-    "prepack": "npm run typecheck && npm run build"
+    "test": "node scripts/build.mjs && node scripts/test.mjs",
+    "preview": "node scripts/build-preview.mjs",
+    "prepack": "npm run typecheck && npm run build",
+    "prepublishOnly": "npm test"
   },
   "peerDependencies": {
     "react": "^18.2.0",

@@ -1,0 +1,26 @@
+name: publish
+
+# 推送 v* 标签即自动发版到 npm（带 provenance）。
+# 需要在仓库 Settings → Secrets and variables → Actions 里配置 NPM_TOKEN（npm 的 Automation/Granular 令牌）。
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://registry.npmjs.org
+      - run: npm ci
+      - run: npm test
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
