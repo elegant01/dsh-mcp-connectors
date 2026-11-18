@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.2] - 2026-11-18
+
+### Changed
+
+- Publishing now uses npm Trusted Publishing (GitHub OIDC) — no token, no OTP.
+
 ## [0.1.1] - 2026-11-17
 
 ### Changed

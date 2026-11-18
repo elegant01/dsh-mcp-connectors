@@ -1,7 +1,8 @@
 name: publish
 
-# 推送 v* 标签即自动发版到 npm（带 provenance）。
-# 需要在仓库 Settings → Secrets and variables → Actions 里配置 NPM_TOKEN（npm 的 Automation/Granular 令牌）。
+# 推送 v* 标签即自动发版到 npm。
+# 认证走 npm Trusted Publishing（GitHub OIDC），不需要 NPM_TOKEN，也不受 2FA/OTP 限制：
+#   npm 包设置 → Trusted Publisher 已绑定 elegant01/dsh-mcp-connectors + 本文件（publish.yml）。
 on:
   push:
     tags:
@@ -12,15 +13,15 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      id-token: write
+      id-token: write # OIDC：换取 npm 的短期发布凭据
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           registry-url: https://registry.npmjs.org
+      # Trusted Publishing 需要 npm >= 11.5
+      - run: npm install -g npm@latest
       - run: npm ci
       - run: npm test
       - run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,6 +1,6 @@
 {
   "name": "dsh-mcp-connectors",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "DSH MCP Manager — 在 DeepSeek Harness 中统一管理本机各 Agent 的 MCP 服务器 · Manage MCP servers across local AI agents in DSH",
   "license": "Apache-2.0",
   "type": "module",
