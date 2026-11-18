@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.3] - 2026-11-18
+
+### 变更
+
+- CI lockfile switched to registry.npmjs.org (mirror tarball URLs are rejected by npm’s EALLOWREMOTE check).
+
 ## [0.1.2] - 2026-11-18
 
 ### Changed
