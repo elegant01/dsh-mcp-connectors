@@ -88,6 +88,19 @@ npm test             # full regression suite against a temp HOME
 npm run preview      # docs/preview.html — real component with fixture data
 ```
 
+## Releasing
+
+Publishing is fully automated:
+
+```bash
+node scripts/bump.cjs 0.2.0   # bump package.json + lockfile + changelog
+git commit -am "chore(release): v0.2.0"
+git push origin main
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+The `publish.yml` workflow runs the full test suite and publishes with [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers) (GitHub OIDC) — no `NPM_TOKEN`, no OTP, and provenance is signed automatically.
+
 ## Icons
 
 Agent brand marks in `assets/agent-icons/` come from [@lobehub/icons](https://github.com/lobehub/lobe-icons) (MIT) and are vendored here; they are inlined into the build, so nothing is loaded from external paths at runtime.

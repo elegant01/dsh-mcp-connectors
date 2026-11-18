@@ -87,6 +87,19 @@ npm test             # 用临时 HOME 跑全量回归
 npm run preview      # docs/preview.html，真实组件 + 假数据
 ```
 
+## 发版
+
+发布全自动：
+
+```bash
+node scripts/bump.cjs 0.2.0   # 同步 package.json + lockfile + changelog
+git commit -am "chore(release): v0.2.0"
+git push origin main
+git tag v0.2.0 && git push origin v0.2.0
+```
+
+`publish.yml` 会跑完整测试并用 [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers)（GitHub OIDC）发布——**不需要 NPM_TOKEN，也不受 OTP 限制**，provenance 自动签名。
+
 ## 图标
 
 `assets/agent-icons/` 下的各 Agent 品牌图标取自 [@lobehub/icons](https://github.com/lobehub/lobe-icons)（MIT），已随仓库拷贝并在构建时内联，运行时不依赖任何外部路径。
