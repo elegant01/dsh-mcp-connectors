@@ -4,6 +4,21 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-18
+
+### Added
+
+- Support DSH's real MCP configuration format: `~/.dsh/profiles/<profile>/cordis.patch.yml` (`@deepseek-ai/dsh-mcp-client` entries). Each profile appears as its own source under the DSH group; reads, adds, edits, deletes, and native `disabled` toggling are supported, and rewrites touch only the target entry's `config:` block so comments and other plugins survive.
+- The previous `~/.dsh/mcp.json` path is still read for backward compatibility.
+- Connector catalog: the seven official `modelcontextprotocol/servers` reference servers are built in, and the official MCP Registry can be searched live. Install into one or more agents at once, then toggle or uninstall from the catalog. Required parameters (directories, repository paths, tokens) are collected up front; Windows DSH targets get `cmd /c npx|uvx` automatically.
+- Connector detail view: repository / website links, package, transport, registry name, launch command with parameter placeholders, environment variables, install parameters, and the agents it is installed in. Cards also link to the repository directly. Registry entries are not all from GitHub; the detail view says so when no repository is attached.
+- The detail view lazily fetches and renders the GitHub repository README (headings / lists / code blocks / links; long files truncated to 600 lines with a GitHub link). Fetching is restricted to github.com → raw.githubusercontent.com and cached for 30 minutes.
+- Online (MCP Registry) is now the default catalog tab and supports cursor pagination via "Load more" — the official `modelcontextprotocol/servers` repo intentionally only maintains a handful of reference implementations.
+- New "mcp.so Top 100" source: reads only the mcp.so rankings page (respects robots.txt and never touches its `/search`), showing rank, author, description, monthly searches, stars and score. Successful fetches are cached to disk; network failures fall back to the last snapshot with an explicit stale marker.
+- mcp.so entries are now installable: clicking Details / Install fetches the entry's detail page on demand, parses its `mcpServers` config (including `${VAR}` / `YOUR_TOKEN` credential placeholders) and opens the normal install form. Pages without a usable config degrade to a link to mcp.so. Detail responses are cached for 30 minutes with a local fallback.
+- Removed the "Official reference" tab. The 7 built-in reference implementations now appear only as an offline fallback when every online source fails and WorkBuddy is not installed.
+- New "WorkBuddy connectors" source: reads the local WorkBuddy official connector marketplace cache (318 entries, 272 installable MCP connectors, the rest CLI). MCP connectors keep WorkBuddy's `${VAR}` credential placeholders and install back into `~/.workbuddy/connectors/default/mcp.json` using the `connector:<id>` convention — real credentials stay in WorkBuddy's own key store and are never written to config by the plugin. CLI connectors are browse-only. The source is hidden entirely when WorkBuddy is not installed.
+
 ## [0.1.4] - 2026-11-18
 
 ### 变更

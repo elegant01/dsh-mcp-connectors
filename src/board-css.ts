@@ -276,6 +276,7 @@ export const BOARD_CSS = `
 .dmm-tag.cyan { background:var(--status-cyan-bg); color:var(--status-cyan-text); }
 .dmm-tag.purple { background:var(--status-purple-bg); color:var(--status-purple-text); }
 .dmm-tag.gray { background:var(--bg-secondary-default); color:var(--text-secondary); }
+.dmm-tag.accent { background:var(--accent-50); color:var(--accent-700); }
 
 /* ---------- 开关 ---------- */
 .dmm-switch {
@@ -408,6 +409,90 @@ export const BOARD_CSS = `
 }
 .dmm[data-theme="dark"] .dmm-toast { background:var(--n-100); color:var(--n-900); }
 .dmm-toast.err { background:var(--status-error-text); color:#fff; }
+
+/* ---------- 连接器目录 ---------- */
+.dmm-catalog-subtitle { font-size:13px; color:var(--text-secondary); margin-bottom:10px; }
+.dmm-catalog-search { display:flex; gap:8px; margin-bottom:6px; }
+.dmm-catalog-search .dmm-input { flex:1; }
+.dmm-catalog-list { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+.dmm-catalog-card {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px; border:1px solid var(--border-table); border-radius:var(--r-ctl);
+  background:var(--bg-primary-default);
+}
+.dmm-catalog-main { flex:1; min-width:0; }
+.dmm-catalog-title { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-weight:600; font-size:14px; }
+.dmm-catalog-desc { font-size:13px; line-height:19px; color:var(--text-secondary); margin-top:4px; }
+.dmm-catalog-meta { margin-top:4px; font-size:12px; color:var(--text-tertiary); }
+.dmm-catalog-meta code { font-family:var(--mono); }
+.dmm-catalog-warn {
+  margin-top:6px; padding:6px 8px; border-radius:var(--r-chip);
+  background:var(--status-yellow-bg); color:var(--status-yellow-text);
+  font-size:12px; line-height:17px;
+}
+.dmm-catalog-installs { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.dmm-catalog-install {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 8px; border-radius:var(--r-chip);
+  background:var(--bg-secondary-default);
+}
+.dmm-catalog-install-name { font-size:12.5px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dmm-catalog-actions { flex:none; display:flex; flex-direction:row; gap:6px; align-items:flex-start; }
+.dmm-detail-section { margin-top:14px; }
+.dmm-detail-section-title { font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+.dmm-detail-grid, .dmm-detail-list { display:flex; flex-direction:column; gap:6px; }
+.dmm-detail-row { display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:18px; }
+.dmm-detail-label { flex:0 0 124px; color:var(--text-secondary); }
+.dmm-detail-value { flex:1; min-width:0; word-break:break-all; }
+.dmm-code-block {
+  margin:0; padding:8px 10px; border-radius:var(--r-chip);
+  background:var(--bg-secondary-default); color:var(--text-primary);
+  font-family:var(--mono); font-size:12px; line-height:18px;
+  white-space:pre-wrap; word-break:break-all;
+}
+.dmm-readme {
+  max-height:340px; overflow:auto;
+  padding:8px 10px;
+  border:1px solid var(--border-table); border-radius:var(--r-chip);
+  background:var(--bg-primary-default);
+  font-size:13px; line-height:20px;
+}
+.dmm-md-p { margin:4px 0; white-space:pre-wrap; }
+.dmm-md-h1 { font-size:16px; font-weight:600; margin:12px 0 6px; }
+.dmm-md-h2 { font-size:15px; font-weight:600; margin:10px 0 5px; }
+.dmm-md-h3 { font-size:14px; font-weight:600; margin:8px 0 4px; }
+.dmm-md-list { margin:4px 0; padding-left:18px; }
+.dmm-md-list li { margin:2px 0; }
+.dmm-md-code {
+  font-family:var(--mono); font-size:12px;
+  padding:1px 4px; border-radius:4px;
+  background:var(--bg-secondary-default);
+}
+.dmm-catalog-more { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+.dmm-modal-head .dmm-segmented { flex-wrap:wrap; }
+.dmm-rank-card {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px; border:1px solid var(--border-table); border-radius:var(--r-ctl);
+  background:var(--bg-primary-default);
+}
+.dmm-rank-no {
+  flex:none; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600; font-variant-numeric:tabular-nums;
+  background:var(--bg-secondary-default); color:var(--text-secondary);
+}
+.dmm-rank-card:nth-child(-n+3) .dmm-rank-no { background:var(--status-yellow-bg); color:var(--status-yellow-text); }
+.dmm-rank-author { font-size:12px; color:var(--text-secondary); }
+.dmm-rank-metrics { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.dmm-link { color:var(--accent-600); text-decoration:none; }
+.dmm-link:hover { text-decoration:underline; }
+.dmm[data-theme="dark"] .dmm-link { color:var(--accent-300); }
+.dmm[data-theme="dark"] .dmm-tag.accent { background:var(--accent-700); color:var(--n-50); }
+.dmm-catalog-meta .dmm-link { margin-left:8px; }
+.dmm-check-list { display:flex; flex-direction:column; gap:6px; }
+.dmm-check { display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+.dmm-check input { accent-color:var(--accent-500); width:15px; height:15px; }
+.dmm-req { color:var(--text-error); }
 
 /* ---------- 响应式 ---------- */
 @media (max-width:1080px) { .dmm-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }

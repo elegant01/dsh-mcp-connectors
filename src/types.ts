@@ -10,6 +10,8 @@ export interface McpServerSpec {
   headers?: Record<string, string>;
   /** 原始定义里的其余字段，读写时原样保留 */
   extra?: Record<string, unknown>;
+  /** 条目级停用标志（仅 DSH 的 cordis.patch.yml 原生支持；其它格式不会出现） */
+  disabled?: boolean;
 }
 
 export type TransportKind = "stdio" | "http" | "sse";
@@ -22,7 +24,7 @@ export interface ServerView {
   enabled: boolean;
 }
 
-export type SourceFormat = "json-mcpServers" | "json-mcp" | "toml-codex";
+export type SourceFormat = "json-mcpServers" | "json-mcp" | "toml-codex" | "cordis-yaml";
 
 export interface SourceDef {
   key: string;

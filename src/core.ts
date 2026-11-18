@@ -2,7 +2,7 @@
 // 启停语义：MCP 各家格式没有统一的 disabled 字段 —— 停用 = 条目从配置文件移出、
 // 原定义存进管理器 state.disabled；启用 = 写回配置文件。任何写入前先备份原文件。
 
-import { readFile, writeFile, rename, access, mkdir } from "node:fs/promises";
+import { readFile, writeFile, rename, access, mkdir, readdir } from "node:fs/promises";
 import { homedir } from "node:os";
 import { dirname, join } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -24,6 +24,7 @@ import type {
 import { BUILTIN_SOURCES, customSourceDef } from "./sources.js";
 import { discoverSources, type DiscoveredSource } from "./discover.js";
 import { parseCodexServers, serializeServerToml, writeCodexServer } from "./toml.js";
+import { hasCordisMcpServers, parseCordisServers, writeCordisServer } from "./cordis.js";
 import { listBackups, loadState, makeBackup, managerDir, removeBackupEntry, updateState } from "./state.js";
 
 export { managerDir };
@@ -58,6 +59,43 @@ async function discoveredSources(coveredPaths: Set<string>): Promise<DiscoveredS
   return items;
 }
 
+/**
+ * DSH 的 MCP 配置实际在 profile 的 cordis.patch.yml 里（@deepseek-ai/dsh-mcp-client 条目），
+ * 不是 ~/.dsh/mcp.json。这里扫描 ~/.dsh/profiles/<name>/cordis.patch.yml，只列出真正声明了
+ * MCP 服务器的 profile（按 profile 拆成独立来源，归组到 DSH）。
+ */
+async function cordisProfileSources(): Promise<Array<{ def: SourceDef; path: string; overridden: boolean }>> {
+  const profilesDir = join(homedir(), ".dsh", "profiles");
+  let entries;
+  try {
+    entries = await readdir(profilesDir, { withFileTypes: true });
+  } catch {
+    return [];
+  }
+  const out: Array<{ def: SourceDef; path: string; overridden: boolean }> = [];
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const file = join(profilesDir, entry.name, "cordis.patch.yml");
+    const text = await readSourceText(file);
+    if (text === null || !hasCordisMcpServers(text)) continue;
+    out.push({
+      def: {
+        key: `dsh-profile-${entry.name}`,
+        label: `DSH（${entry.name}）`,
+        format: "cordis-yaml",
+        paths: [file],
+        writable: true,
+        group: "dsh",
+        groupLabel: "DSH",
+      },
+      path: file,
+      overridden: false,
+    });
+  }
+  out.sort((a, b) => a.path.localeCompare(b.path));
+  return out;
+}
+
 /** 汇总来源表：内置 + state 覆盖 + 自定义来源 + 自动发现。每次请求重读，不缓存。 */
 async function resolveSources(): Promise<Array<{ def: SourceDef; path: string | null; overridden: boolean }>> {
   const state = await loadState();
@@ -78,6 +116,11 @@ async function resolveSources(): Promise<Array<{ def: SourceDef; path: string | 
     }
     // 都不存在时，用第一个候选作为"待创建"的写入目标
     out.push({ def, path: found ?? expandPath(def.paths[0]), overridden: false });
+  }
+  for (const profile of await cordisProfileSources()) {
+    const override = state.rootOverrides[profile.def.key];
+    if (override) out.push({ ...profile, path: expandPath(override), overridden: true });
+    else out.push(profile);
   }
   for (const custom of state.customSources) {
     out.push({
@@ -196,6 +239,7 @@ function parseJsonLenient(text: string): unknown {
 /** 按格式从文件内容提取服务器表。空文件视为无服务器（有些 agent 会落 0 字节占位文件）。 */
 function extractServers(def: SourceDef, text: string): Record<string, McpServerSpec> {
   if (!text.trim()) return {};
+  if (def.format === "cordis-yaml") return parseCordisServers(text);
   if (def.format === "toml-codex") return parseCodexServers(text);
   const parsed = parseJsonLenient(text) as Record<string, unknown>;
   if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
@@ -257,10 +301,11 @@ async function buildSourceView(entry: { def: SourceDef; path: string | null; ove
     transport: transportOf(spec),
     summary: summarize(spec),
     spec: denormalizeSpec(spec) as McpServerSpec,
-    enabled: true,
+    // cordis 条目有原生 disabled 字段；其它格式没有
+    enabled: spec.disabled !== true,
   }));
-  // 追加管理器里被停用的条目
-  for (const [compound, spec] of Object.entries(state.disabled)) {
+  // 追加管理器里被停用的条目（cordis 用原生 disabled，不经过 state）
+  if (def.format !== "cordis-yaml") for (const [compound, spec] of Object.entries(state.disabled)) {
     const slash = compound.indexOf("/");
     if (compound.slice(0, slash) !== def.key) continue;
     const name = compound.slice(slash + 1);
@@ -318,6 +363,20 @@ function denormalizeSpec(spec: McpServerSpec): Record<string, unknown> {
 /** 把"启用态"的服务器集合写回配置文件。调用前必须已备份。 */
 async function writeServers(def: SourceDef, path: string, enabled: Record<string, McpServerSpec>): Promise<void> {
   await mkdir(dirname(path), { recursive: true });
+  if (def.format === "cordis-yaml") {
+    let text = (await readSourceText(path)) ?? "";
+    const current = parseCordisServers(text);
+    // 删除不在启用集合里的（停用的条目仍在集合里，带 disabled 标志）
+    for (const name of Object.keys(current)) {
+      if (!(name in enabled)) text = writeCordisServer(text, name, null);
+    }
+    // 写入/更新启用集合（含停用条目，保留其 disabled 状态）
+    for (const [name, spec] of Object.entries(enabled)) {
+      text = writeCordisServer(text, name, spec);
+    }
+    await atomicWriteFile(path, text);
+    return;
+  }
   if (def.format === "toml-codex") {
     let text = (await readSourceText(path)) ?? "";
     const current = parseCodexServers(text);
@@ -379,6 +438,32 @@ async function mutateSource(
 }
 
 export async function setServerEnabled(sourceKey: string, name: string, enabledFlag: boolean, log: Log) {
+  const found = await findSource(sourceKey);
+  if (found.def.format === "cordis-yaml") {
+    // cordis 条目有原生 disabled 字段：停用/启用只改这一行，条目留在文件里
+    const compound = `${sourceKey}/${name}`;
+    let restored = false;
+    const result = await mutateSource(sourceKey, log, `${enabledFlag ? "enable" : "disable"} ${name}`, async (enabled) => {
+      const spec = enabled[name];
+      if (spec) {
+        if (enabledFlag) delete spec.disabled;
+        else spec.disabled = true;
+        return;
+      }
+      if (!enabledFlag) fail(404, "error.server.notFound", `服务器不存在: ${name}`);
+      // 兼容旧版把条目移出文件存进 state.disabled 的情况：启用时写回
+      const state = await loadState();
+      const saved = state.disabled[compound];
+      if (!saved) fail(404, "error.server.notFound", `服务器不存在: ${name}`);
+      enabled[name] = { ...saved };
+      delete enabled[name].disabled;
+      restored = true;
+    });
+    if (result.ok && restored) {
+      await updateState((s) => { delete s.disabled[compound]; });
+    }
+    return result;
+  }
   if (!enabledFlag) {
     // 停用：从配置移出，定义存进 state.disabled
     const { def } = await findSource(sourceKey);
@@ -453,6 +538,91 @@ export async function upsertServer(input: ServerInput, log: Log) {
   return result;
 }
 
+/** 连接器目录的一次安装目标：把同一份 spec 写进多个 Agent 配置。 */
+export interface CatalogInstallSpec {
+  command?: string;
+  args?: string[];
+  env?: Record<string, string>;
+  url?: string;
+  headers?: Record<string, string>;
+  /** 额外写入配置的字段（如 WorkBuddy 的 timeout / disabledTools），写入前会平铺到顶层 */
+  extra?: Record<string, unknown>;
+}
+
+export async function installCatalogServers(
+  input: { name?: string; targets?: string[]; spec?: CatalogInstallSpec },
+  log: Log,
+) {
+  const name = String(input.name || "").trim();
+  if (!/^[^\s/\\]{1,64}$/.test(name)) {
+    return { ok: false as const, code: "error.server.name", error: `服务器名无效（1-64 字符，不含空白与斜杠）: ${name}` };
+  }
+  const targets = [...new Set(Array.isArray(input.targets) ? input.targets.map(String).filter(Boolean) : [])].slice(0, 32);
+  if (!targets.length) {
+    return { ok: false as const, code: "error.catalog.targets", error: "至少选择一个写入目标" };
+  }
+  const spec = input.spec;
+  if (!spec || typeof spec !== "object" || (!spec.command && !spec.url)) {
+    return { ok: false as const, code: "error.catalog.spec", error: "连接器定义缺少 command 或 url" };
+  }
+
+  const results: Array<Record<string, unknown>> = [];
+  for (const target of targets) {
+    try {
+      const hit = await findSource(target);
+      // extra 是目录条目的内部结构，写入配置时要平铺到顶层
+      const { extra, ...base } = spec;
+      let writeSpec: Record<string, unknown> = { ...base, ...(extra ?? {}) };
+      // DSH 的 mcp-client 直接 spawn，不经过 shell；Windows 上 npx/uvx 是 .cmd 包装，需要 cmd /c
+      if (
+        process.platform === "win32" &&
+        hit.def.format === "cordis-yaml" &&
+        typeof spec.command === "string" &&
+        /^(npx|uvx|npm)$/i.test(spec.command)
+      ) {
+        writeSpec = { ...writeSpec, command: "cmd", args: ["/c", spec.command, ...(spec.args ?? []).map(String)] };
+      }
+      const result = await upsertServer({ source: target, name, raw: JSON.stringify(writeSpec) }, log);
+      results.push({ source: target, ...result });
+    } catch (caught) {
+      const e = caught as CodedError;
+      results.push({ source: target, ok: false, code: e.code ?? "error.catalog.install", error: e.message });
+    }
+  }
+  return { results };
+}
+
+export async function uninstallCatalogServers(input: { name?: string; targets?: string[] }, log: Log) {
+  const name = String(input.name || "").trim();
+  const targets = [...new Set(Array.isArray(input.targets) ? input.targets.map(String).filter(Boolean) : [])].slice(0, 32);
+  if (!name) return { ok: false as const, code: "error.server.name", error: "缺少服务器名" };
+  if (!targets.length) return { ok: false as const, code: "error.catalog.targets", error: "至少选择一个写入目标" };
+
+  const results: Array<Record<string, unknown>> = [];
+  for (const target of targets) {
+    try {
+      const hit = await findSource(target);
+      // 目标文件不存在时不创建空配置
+      if (!hit.path) {
+        results.push({ source: target, ok: true, skipped: true });
+        continue;
+      }
+      try {
+        await access(hit.path);
+      } catch {
+        results.push({ source: target, ok: true, skipped: true });
+        continue;
+      }
+      const result = await deleteServer(target, name, log);
+      results.push({ source: target, ...result });
+    } catch (caught) {
+      const e = caught as CodedError;
+      results.push({ source: target, ok: false, code: e.code ?? "error.catalog.uninstall", error: e.message });
+    }
+  }
+  return { results };
+}
+
 export async function deleteServer(sourceKey: string, name: string, log: Log) {
   // 先清停用存储里的同名条目（不碰配置文件）
   await updateState((s) => {
@@ -495,7 +665,9 @@ export async function deleteBackup(id: string) {
 // ---------- 来源路径覆盖与自定义来源 ----------
 
 export async function setRootPath(key: string, path: string | null) {
-  if (!BUILTIN_SOURCES.some((s) => s.key === key)) {
+  // 内置来源 + 按 profile 动态生成的 DSH 来源都允许改路径
+  const known = (await resolveSources()).some((source) => source.def.key === key);
+  if (!known) {
     return { ok: false as const, code: "error.source.unknown", error: `未知配置来源: ${key}` };
   }
   if (path !== null) {

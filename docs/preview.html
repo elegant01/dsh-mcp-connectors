@@ -7531,6 +7531,7 @@
 .dmm-tag.cyan { background:var(--status-cyan-bg); color:var(--status-cyan-text); }
 .dmm-tag.purple { background:var(--status-purple-bg); color:var(--status-purple-text); }
 .dmm-tag.gray { background:var(--bg-secondary-default); color:var(--text-secondary); }
+.dmm-tag.accent { background:var(--accent-50); color:var(--accent-700); }
 
 /* ---------- \u5F00\u5173 ---------- */
 .dmm-switch {
@@ -7664,6 +7665,90 @@
 .dmm[data-theme="dark"] .dmm-toast { background:var(--n-100); color:var(--n-900); }
 .dmm-toast.err { background:var(--status-error-text); color:#fff; }
 
+/* ---------- \u8FDE\u63A5\u5668\u76EE\u5F55 ---------- */
+.dmm-catalog-subtitle { font-size:13px; color:var(--text-secondary); margin-bottom:10px; }
+.dmm-catalog-search { display:flex; gap:8px; margin-bottom:6px; }
+.dmm-catalog-search .dmm-input { flex:1; }
+.dmm-catalog-list { display:flex; flex-direction:column; gap:10px; margin-top:10px; }
+.dmm-catalog-card {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px; border:1px solid var(--border-table); border-radius:var(--r-ctl);
+  background:var(--bg-primary-default);
+}
+.dmm-catalog-main { flex:1; min-width:0; }
+.dmm-catalog-title { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-weight:600; font-size:14px; }
+.dmm-catalog-desc { font-size:13px; line-height:19px; color:var(--text-secondary); margin-top:4px; }
+.dmm-catalog-meta { margin-top:4px; font-size:12px; color:var(--text-tertiary); }
+.dmm-catalog-meta code { font-family:var(--mono); }
+.dmm-catalog-warn {
+  margin-top:6px; padding:6px 8px; border-radius:var(--r-chip);
+  background:var(--status-yellow-bg); color:var(--status-yellow-text);
+  font-size:12px; line-height:17px;
+}
+.dmm-catalog-installs { display:flex; flex-direction:column; gap:6px; margin-top:8px; }
+.dmm-catalog-install {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 8px; border-radius:var(--r-chip);
+  background:var(--bg-secondary-default);
+}
+.dmm-catalog-install-name { font-size:12.5px; color:var(--text-secondary); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.dmm-catalog-actions { flex:none; display:flex; flex-direction:row; gap:6px; align-items:flex-start; }
+.dmm-detail-section { margin-top:14px; }
+.dmm-detail-section-title { font-size:12px; font-weight:600; color:var(--text-secondary); text-transform:uppercase; letter-spacing:.04em; margin-bottom:6px; }
+.dmm-detail-grid, .dmm-detail-list { display:flex; flex-direction:column; gap:6px; }
+.dmm-detail-row { display:flex; gap:10px; align-items:flex-start; font-size:13px; line-height:18px; }
+.dmm-detail-label { flex:0 0 124px; color:var(--text-secondary); }
+.dmm-detail-value { flex:1; min-width:0; word-break:break-all; }
+.dmm-code-block {
+  margin:0; padding:8px 10px; border-radius:var(--r-chip);
+  background:var(--bg-secondary-default); color:var(--text-primary);
+  font-family:var(--mono); font-size:12px; line-height:18px;
+  white-space:pre-wrap; word-break:break-all;
+}
+.dmm-readme {
+  max-height:340px; overflow:auto;
+  padding:8px 10px;
+  border:1px solid var(--border-table); border-radius:var(--r-chip);
+  background:var(--bg-primary-default);
+  font-size:13px; line-height:20px;
+}
+.dmm-md-p { margin:4px 0; white-space:pre-wrap; }
+.dmm-md-h1 { font-size:16px; font-weight:600; margin:12px 0 6px; }
+.dmm-md-h2 { font-size:15px; font-weight:600; margin:10px 0 5px; }
+.dmm-md-h3 { font-size:14px; font-weight:600; margin:8px 0 4px; }
+.dmm-md-list { margin:4px 0; padding-left:18px; }
+.dmm-md-list li { margin:2px 0; }
+.dmm-md-code {
+  font-family:var(--mono); font-size:12px;
+  padding:1px 4px; border-radius:4px;
+  background:var(--bg-secondary-default);
+}
+.dmm-catalog-more { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
+.dmm-modal-head .dmm-segmented { flex-wrap:wrap; }
+.dmm-rank-card {
+  display:flex; gap:12px; align-items:flex-start;
+  padding:12px; border:1px solid var(--border-table); border-radius:var(--r-ctl);
+  background:var(--bg-primary-default);
+}
+.dmm-rank-no {
+  flex:none; width:30px; height:30px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:13px; font-weight:600; font-variant-numeric:tabular-nums;
+  background:var(--bg-secondary-default); color:var(--text-secondary);
+}
+.dmm-rank-card:nth-child(-n+3) .dmm-rank-no { background:var(--status-yellow-bg); color:var(--status-yellow-text); }
+.dmm-rank-author { font-size:12px; color:var(--text-secondary); }
+.dmm-rank-metrics { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:6px; }
+.dmm-link { color:var(--accent-600); text-decoration:none; }
+.dmm-link:hover { text-decoration:underline; }
+.dmm[data-theme="dark"] .dmm-link { color:var(--accent-300); }
+.dmm[data-theme="dark"] .dmm-tag.accent { background:var(--accent-700); color:var(--n-50); }
+.dmm-catalog-meta .dmm-link { margin-left:8px; }
+.dmm-check-list { display:flex; flex-direction:column; gap:6px; }
+.dmm-check { display:flex; align-items:center; gap:8px; font-size:13px; cursor:pointer; }
+.dmm-check input { accent-color:var(--accent-500); width:15px; height:15px; }
+.dmm-req { color:var(--text-error); }
+
 /* ---------- \u54CD\u5E94\u5F0F ---------- */
 @media (max-width:1080px) { .dmm-kpi-grid { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media (max-width:640px) {
@@ -7704,6 +7789,201 @@
     "ccswitch": '<svg fill="currentColor" fill-rule="evenodd" style="flex:none;line-height:1" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.15em"><title>Cline</title><path d="M17.035 3.991c2.75 0 4.98 2.24 4.98 5.003v1.667l1.45 2.896a1.01 1.01 0 01-.002.909l-1.448 2.864v1.668c0 2.762-2.23 5.002-4.98 5.002H7.074c-2.751 0-4.98-2.24-4.98-5.002V17.33l-1.48-2.855a1.01 1.01 0 01-.003-.927l1.482-2.887V8.994c0-2.763 2.23-5.003 4.98-5.003h9.962zM8.265 9.6a2.274 2.274 0 00-2.274 2.274v4.042a2.274 2.274 0 004.547 0v-4.042A2.274 2.274 0 008.265 9.6zm7.326 0a2.274 2.274 0 00-2.274 2.274v4.042a2.274 2.274 0 104.548 0v-4.042A2.274 2.274 0 0015.59 9.6z"></path><path d="M12.054 5.558a2.779 2.779 0 100-5.558 2.779 2.779 0 000 5.558z"></path></svg>',
     fallback: '<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" width="1em" height="1em" aria-hidden="true" style="vertical-align:-0.15em"><path d="M6 1.5v3M10 1.5v3M4 4.5h8v3a4 4 0 0 1-8 0v-3zM8 11.5v3"/></svg>'
   };
+
+  // src/catalog-data.ts
+  var REFERENCE_WARNING = "\u5B98\u65B9\u53C2\u8003\u5B9E\u73B0\uFF0C\u7528\u6765\u6F14\u793A MCP \u80FD\u529B\uFF0C\u4E0D\u5EFA\u8BAE\u76F4\u63A5\u7528\u4E8E\u751F\u4EA7\u73AF\u5883\uFF1B\u8BF7\u81EA\u884C\u8BC4\u4F30\u6743\u9650\u4E0E\u5B89\u5168\u8FB9\u754C\u3002";
+  var OFFICIAL_CATALOG = [
+    {
+      id: "filesystem",
+      title: "Filesystem",
+      description: "Secure file operations with configurable access controls.",
+      descriptionZh: "\u5E26\u8BBF\u95EE\u63A7\u5236\u7684\u5B89\u5168\u6587\u4EF6\u8BFB\u5199\u3001\u641C\u7D22\u4E0E\u7F16\u8F91\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "@modelcontextprotocol/server-filesystem",
+      command: "npx",
+      args: ["-y", "@modelcontextprotocol/server-filesystem", "{{dirs}}"],
+      fields: [
+        {
+          key: "dirs",
+          label: "\u5141\u8BB8\u8BBF\u95EE\u7684\u76EE\u5F55",
+          labelEn: "Allowed directories",
+          description: "\u6BCF\u884C\u4E00\u4E2A\u7EDD\u5BF9\u8DEF\u5F84\uFF1B\u670D\u52A1\u5668\u53EA\u80FD\u8BBF\u95EE\u8FD9\u4E9B\u76EE\u5F55\u3002",
+          required: true,
+          kind: "lines",
+          placeholder: "F:\\centos\\my-project"
+        }
+      ],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/filesystem",
+      tags: ["files"],
+      warning: REFERENCE_WARNING
+    },
+    {
+      id: "git",
+      title: "Git",
+      description: "Tools to read, search, and manipulate Git repositories.",
+      descriptionZh: "\u8BFB\u53D6\u3001\u641C\u7D22\u548C\u64CD\u4F5C Git \u4ED3\u5E93\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "mcp-server-git",
+      command: "uvx",
+      args: ["mcp-server-git", "--repository", "{{repo}}"],
+      fields: [
+        {
+          key: "repo",
+          label: "\u4ED3\u5E93\u8DEF\u5F84",
+          labelEn: "Repository path",
+          required: true,
+          kind: "path",
+          default: ".",
+          placeholder: "F:\\centos\\my-project"
+        }
+      ],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/git",
+      tags: ["git"],
+      warning: REFERENCE_WARNING
+    },
+    {
+      id: "memory",
+      title: "Memory",
+      description: "Knowledge graph-based persistent memory system.",
+      descriptionZh: "\u57FA\u4E8E\u77E5\u8BC6\u56FE\u8C31\u7684\u6301\u4E45\u8BB0\u5FC6\u7CFB\u7EDF\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "@modelcontextprotocol/server-memory",
+      command: "npx",
+      args: ["-y", "@modelcontextprotocol/server-memory"],
+      env: { MEMORY_FILE_PATH: "{{MEMORY_FILE_PATH}}" },
+      fields: [
+        {
+          key: "MEMORY_FILE_PATH",
+          label: "\u8BB0\u5FC6\u6587\u4EF6\u8DEF\u5F84\uFF08\u53EF\u9009\uFF09",
+          labelEn: "Memory file path (optional)",
+          description: "\u7559\u7A7A\u5219\u4F7F\u7528\u670D\u52A1\u5668\u9ED8\u8BA4\u4F4D\u7F6E\u3002",
+          kind: "path",
+          placeholder: "F:\\centos\\.mcp\\memory.json"
+        }
+      ],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/memory",
+      tags: ["memory"],
+      warning: REFERENCE_WARNING
+    },
+    {
+      id: "sequential-thinking",
+      title: "Sequential Thinking",
+      description: "Dynamic and reflective problem-solving through thought sequences.",
+      descriptionZh: "\u901A\u8FC7\u9010\u6B65\u601D\u8003\u5E8F\u5217\u8FDB\u884C\u52A8\u6001\u63A8\u7406\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "@modelcontextprotocol/server-sequential-thinking",
+      command: "npx",
+      args: ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      fields: [],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/sequentialthinking",
+      tags: ["reasoning"],
+      warning: REFERENCE_WARNING
+    },
+    {
+      id: "time",
+      title: "Time",
+      description: "Time and timezone conversion capabilities.",
+      descriptionZh: "\u65F6\u95F4\u4E0E\u65F6\u533A\u8F6C\u6362\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "mcp-server-time",
+      command: "uvx",
+      args: ["mcp-server-time", "--local-timezone={{tz}}"],
+      fields: [
+        {
+          key: "tz",
+          label: "\u672C\u5730\u65F6\u533A\uFF08\u53EF\u9009\uFF09",
+          labelEn: "Local timezone (optional)",
+          placeholder: "Asia/Shanghai"
+        }
+      ],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/time",
+      tags: ["time"],
+      warning: REFERENCE_WARNING
+    },
+    {
+      id: "fetch",
+      title: "Fetch",
+      description: "Web content fetching and conversion for efficient LLM usage.",
+      descriptionZh: "\u6293\u53D6\u7F51\u9875\u5E76\u8F6C\u6210\u9002\u5408 LLM \u4F7F\u7528\u7684\u6587\u672C\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "mcp-server-fetch",
+      command: "uvx",
+      args: ["mcp-server-fetch"],
+      fields: [],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/fetch",
+      tags: ["web"],
+      warning: REFERENCE_WARNING
+    },
+    {
+      id: "everything",
+      title: "Everything",
+      description: "Reference / test server with prompts, resources, and tools.",
+      descriptionZh: "\u53C2\u8003/\u6D4B\u8BD5\u670D\u52A1\u5668\uFF0C\u8986\u76D6 prompts\u3001resources\u3001tools \u5168\u90E8\u80FD\u529B\u3002",
+      source: "official",
+      transport: "stdio",
+      packageId: "@modelcontextprotocol/server-everything",
+      command: "npx",
+      args: ["-y", "@modelcontextprotocol/server-everything"],
+      fields: [],
+      repository: "https://github.com/modelcontextprotocol/servers/tree/main/src/everything",
+      tags: ["test"],
+      warning: REFERENCE_WARNING
+    }
+  ];
+  function expandCatalogSpec(entry, values) {
+    const val = (key) => values[key] ?? "";
+    const fieldByKey = Object.fromEntries(entry.fields.map((field) => [field.key, field]));
+    const placeholders = (text) => [...text.matchAll(/\{\{([\w-]+)\}\}/g)].map((match) => match[1]);
+    const expand = (text) => text.replace(/\{\{([\w-]+)\}\}/g, (_, key) => val(key));
+    const args = [];
+    for (const template of entry.args ?? []) {
+      const keys = placeholders(template);
+      if (keys.length && keys.every((key) => !val(key).trim())) continue;
+      const linesKey = keys.length === 1 && fieldByKey[keys[0]]?.kind === "lines" ? keys[0] : null;
+      if (linesKey) {
+        for (const line of val(linesKey).split(/\r?\n/).map((item) => item.trim()).filter(Boolean)) args.push(line);
+      } else {
+        args.push(expand(template));
+      }
+    }
+    const env = {};
+    for (const [key, template] of Object.entries(entry.env ?? {})) {
+      const keys = placeholders(template);
+      if (keys.length && keys.every((field) => !val(field).trim())) continue;
+      env[key] = expand(template);
+    }
+    const headers = {};
+    for (const [key, template] of Object.entries(entry.headers ?? {})) {
+      const keys = placeholders(template);
+      if (keys.length && keys.every((field) => !val(field).trim())) continue;
+      headers[key] = expand(template);
+    }
+    const spec = {};
+    if (entry.command) spec.command = entry.command;
+    if (args.length) spec.args = args;
+    if (Object.keys(env).length) spec.env = env;
+    if (entry.url) spec.url = entry.url;
+    if (Object.keys(headers).length) spec.headers = headers;
+    if (entry.extra && Object.keys(entry.extra).length) spec.extra = entry.extra;
+    return spec;
+  }
+  function matchesCatalogEntry(entry, name, spec) {
+    if (name === entry.id) return true;
+    if (entry.url && spec.url === entry.url) return true;
+    if (entry.packageId) {
+      const needle = entry.packageId;
+      if (spec.command === needle) return true;
+      if (spec.args?.some((arg) => arg === needle)) return true;
+      if (spec.url?.includes(needle)) return true;
+    }
+    return false;
+  }
 
   // src/client.ts
   var h = React.createElement;
@@ -7791,7 +8071,81 @@
     toastFailed: "\u64CD\u4F5C\u5931\u8D25",
     themeToggle: "\u5207\u6362\u4E3B\u9898",
     openFolder: "\u6253\u5F00\u6240\u5728\u6587\u4EF6\u5939",
-    backToTop: "\u56DE\u5230\u9876\u90E8"
+    backToTop: "\u56DE\u5230\u9876\u90E8",
+    discover: "\u53D1\u73B0\u8FDE\u63A5\u5668",
+    catalogTitle: "\u53D1\u73B0\u8FDE\u63A5\u5668",
+    catalogSubtitle: "\u4ECE MCP Registry\u3001mcp.so \u6216 WorkBuddy \u5E02\u573A\u53D1\u73B0\u8FDE\u63A5\u5668\uFF0C\u9009\u4E2D Agent \u540E\u4E00\u952E\u5B89\u88C5",
+    catalogOfficial: "\u5B98\u65B9\u53C2\u8003",
+    catalogRegistry: "\u5728\u7EBF\u53D1\u73B0",
+    catalogSearchPlaceholder: "\u641C\u7D22 MCP Registry\uFF08\u540D\u79F0 / \u63CF\u8FF0\uFF09\u2026",
+    catalogSearch: "\u641C\u7D22",
+    catalogRegistryHint: "\u6570\u636E\u6765\u81EA\u5B98\u65B9 MCP Registry\u3002\u5B89\u88C5\u524D\u8BF7\u786E\u8BA4\u6765\u6E90\u53EF\u4FE1\u2014\u2014\u5B83\u4F1A\u5728\u5BF9\u5E94 Agent \u542F\u52A8\u65F6\u8FD0\u884C\u3002",
+    catalogInstall: "\u5B89\u88C5",
+    catalogInstalled: "\u5DF2\u5B89\u88C5",
+    catalogUninstall: "\u5378\u8F7D",
+    catalogConfirmUninstall: "\u786E\u8BA4\u5378\u8F7D",
+    catalogTargets: "\u5B89\u88C5\u5230",
+    catalogName: "\u670D\u52A1\u5668\u540D\u79F0",
+    catalogNoTargets: "\u6CA1\u6709\u53EF\u5199\u5165\u7684 Agent \u914D\u7F6E\u3002",
+    catalogNoResults: "\u6CA1\u6709\u5339\u914D\u7684\u8FDE\u63A5\u5668\u3002",
+    catalogLoading: "\u6B63\u5728\u8FDE\u63A5 MCP Registry\u2026",
+    catalogFailed: "\u52A0\u8F7D\u5931\u8D25",
+    catalogRequired: "\u5FC5\u586B",
+    catalogInstallDone: "\u5B89\u88C5\u5B8C\u6210",
+    catalogUninstallDone: "\u5DF2\u5378\u8F7D",
+    catalogPartial: "\u90E8\u5206\u76EE\u6807\u5931\u8D25",
+    catalogBack: "\u8FD4\u56DE\u5217\u8868",
+    catalogEmptyQuery: "\u8F93\u5165\u5173\u952E\u8BCD\u641C\u7D22\uFF0C\u6216\u76F4\u63A5\u6D4F\u89C8\u6700\u65B0\u6536\u5F55\u3002",
+    catalogSourceRepo: "modelcontextprotocol/servers",
+    catalogDetails: "\u8BE6\u60C5",
+    catalogRepository: "\u4ED3\u5E93\u5730\u5740",
+    catalogWebsite: "\u5B98\u7F51 / \u6587\u6863",
+    catalogCommand: "\u542F\u52A8\u547D\u4EE4",
+    catalogPackage: "\u5305",
+    catalogTransport: "\u4F20\u8F93\u65B9\u5F0F",
+    catalogRegistryName: "Registry \u540D\u79F0",
+    catalogEnvVars: "\u73AF\u5883\u53D8\u91CF",
+    catalogParams: "\u5B89\u88C5\u53C2\u6570",
+    catalogInstalledIn: "\u5DF2\u5B89\u88C5\u4E8E",
+    catalogBasicInfo: "\u57FA\u672C\u4FE1\u606F",
+    catalogNoRepo: "\u8BE5\u6761\u76EE\u6CA1\u6709\u9644\u5E26\u4ED3\u5E93\u5730\u5740\uFF08\u53EF\u80FD\u662F\u6258\u7BA1\u670D\u52A1\uFF09\u3002",
+    catalogDetailHint: "\u53C2\u6570\u91CC\u7684 <\u2026> \u8868\u793A\u5B89\u88C5\u65F6\u9700\u8981\u586B\u5199\u7684\u5B57\u6BB5\u3002",
+    catalogReadme: "README",
+    catalogReadmeLoading: "\u6B63\u5728\u8BFB\u53D6\u4ED3\u5E93 README\u2026",
+    catalogReadmeFailed: "README \u8BFB\u53D6\u5931\u8D25",
+    catalogReadmeTruncated: "README \u8FC7\u957F\uFF0C\u4EC5\u663E\u793A\u524D 600 \u884C\uFF1B\u5B8C\u6574\u5185\u5BB9\u8BF7\u5230 GitHub \u67E5\u770B\u3002",
+    catalogViewOnGitHub: "\u5728 GitHub \u67E5\u770B",
+    catalogLoadMore: "\u52A0\u8F7D\u66F4\u591A",
+    catalogLoaded: "\u5DF2\u52A0\u8F7D",
+    catalogOfficialHint: "\u5B98\u65B9\u4ED3\u5E93\u53EA\u7EF4\u62A4\u5C11\u91CF\u53C2\u8003\u5B9E\u73B0\u3002\u5B8C\u6574\u76EE\u5F55\u8BF7\u5207\u5230\u300C\u5728\u7EBF\u53D1\u73B0\u300D\uFF08\u5B98\u65B9 MCP Registry\uFF0C\u6536\u5F55\u6570\u5343\u4E2A\u53EF\u5B89\u88C5\u670D\u52A1\u5668\uFF09\u3002",
+    catalogMcpso: "mcp.so \u70ED\u95E8",
+    catalogMcpsoHint: "\u53EA\u5C55\u793A mcp.so \u6392\u884C\u699C Top 100\uFF08\u53EA\u8BFB\uFF09\uFF0C\u70B9\u6761\u76EE\u8DF3\u8F6C mcp.so \u770B\u8BE6\u60C5\u3002",
+    catalogMcpsoLoading: "\u6B63\u5728\u8BFB\u53D6 mcp.so \u6392\u884C\u699C\u2026",
+    catalogMcpsoFailed: "mcp.so \u6392\u884C\u699C\u52A0\u8F7D\u5931\u8D25",
+    catalogMcpsoStale: "\u5F53\u524D\u65E0\u6CD5\u8BBF\u95EE mcp.so\uFF0C\u663E\u793A\u7684\u662F\u4E0A\u6B21\u6210\u529F\u6293\u53D6\u7684\u7F13\u5B58\u3002",
+    catalogMcpsoFetched: "\u6293\u53D6\u65F6\u95F4",
+    catalogOpenOnMcpso: "\u5728 mcp.so \u67E5\u770B",
+    catalogRankMonthly: "\u6708\u641C",
+    catalogRankStars: "\u661F\u6807",
+    catalogRankScore: "\u8BC4\u5206",
+    catalogWorkbuddy: "WorkBuddy \u8FDE\u63A5\u5668",
+    catalogWorkbuddyHint: "\u8BFB\u53D6\u672C\u673A WorkBuddy \u5B98\u65B9\u8FDE\u63A5\u5668\u5E02\u573A\uFF1BMCP \u7C7B\u578B\u53EF\u5B89\u88C5\u5230 WorkBuddy\uFF0CCLI \u7C7B\u578B\u4EC5\u5C55\u793A\u3002",
+    catalogWorkbuddyLoading: "\u6B63\u5728\u8BFB\u53D6 WorkBuddy \u8FDE\u63A5\u5668\u2026",
+    catalogWorkbuddyFailed: "WorkBuddy \u8FDE\u63A5\u5668\u8BFB\u53D6\u5931\u8D25",
+    catalogInstallable: "\u53EF\u5B89\u88C5",
+    catalogCliOnly: "CLI\uFF08\u4EC5 WorkBuddy\uFF09",
+    catalogFilter: "\u7B5B\u9009",
+    catalogRetry: "\u91CD\u8BD5",
+    catalogExamples: "\u4F7F\u7528\u793A\u4F8B",
+    catalogGetCredential: "\u83B7\u53D6\u51ED\u636E / \u67E5\u770B\u6587\u6863",
+    catalogFixedTarget: "\u5B89\u88C5\u76EE\u6807\u56FA\u5B9A\u4E3A WorkBuddy",
+    catalogWbNotInstalled: "\u672A\u68C0\u6D4B\u5230 WorkBuddy \u8FDE\u63A5\u5668\u5E02\u573A\u3002",
+    catalogConnectorsUnit: "\u4E2A\u8FDE\u63A5\u5668",
+    catalogOfflineTitle: "\u79BB\u7EBF\u53EF\u7528\u7684\u5185\u7F6E\u53C2\u8003\u5B9E\u73B0",
+    catalogOfflineHint: "\u5728\u7EBF\u6765\u6E90\u90FD\u4E0D\u53EF\u7528\uFF0C\u4E14\u672C\u673A\u6CA1\u6709 WorkBuddy \u8FDE\u63A5\u5668\uFF1B\u4E0B\u9762\u8FD9 7 \u4E2A\u5B98\u65B9\u53C2\u8003\u5B9E\u73B0\u4E0D\u9700\u8981\u8054\u7F51\u5373\u53EF\u5B89\u88C5\u3002",
+    catalogRankDetailLoading: "\u6B63\u5728\u8BFB\u53D6 mcp.so \u8BE6\u60C5\u2026",
+    catalogRankDetailFailed: "mcp.so \u8BE6\u60C5\u8BFB\u53D6\u5931\u8D25",
+    catalogRankNoConfig: "\u8BE5\u6761\u76EE\u5728 mcp.so \u8BE6\u60C5\u9875\u6CA1\u6709\u53EF\u7528\u7684\u5B89\u88C5\u914D\u7F6E\uFF0C\u53EA\u80FD\u8DF3\u8F6C\u67E5\u770B\u3002"
   };
   var API_PREFIX = "/api/dsh-mcp-connectors";
   var MUTATION_HEADERS = { "content-type": "application/json", "x-dsh-mcp-connectors": "1" };
@@ -7851,7 +8205,8 @@
     folder: "M2 4.5A1.5 1.5 0 0 1 3.5 3h2.6a1.5 1.5 0 0 1 1.06.44L8.3 4.6a1.5 1.5 0 0 0 1.06.44h3.14A1.5 1.5 0 0 1 14 6.55v5.95a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 12.5z",
     chevron: "M4 6l4 4 4-4",
     fold: "M4 8h8M4 12h8M4 4h8",
-    bolt: "M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z"
+    bolt: "M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z",
+    plug: "M5.5 2v3M10.5 2v3M3.5 5h9v2.5a4.5 4.5 0 0 1-9 0zM8 12v2.5"
   };
   function detectHostTheme() {
     try {
@@ -8303,6 +8658,7 @@
           ),
           h("button", { className: "dmm-icon-btn", title: t2("addSource"), onClick: () => setModal({ type: "customSource" }) }, icon(ICONS.plus)),
           h("div", { className: "grow" }),
+          h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: () => setModal({ type: "catalog" }) }, icon(ICONS.plug, 13), t2("discover")),
           h("button", { className: "dmm-icon-btn", title: t2("refresh"), onClick: () => refresh() }, icon(ICONS.refresh)),
           h(
             "button",
@@ -8358,7 +8714,7 @@
         style: { right: topPos.right, bottom: topPos.bottom }
       }, h("span", { style: { display: "inline-flex", transform: "rotate(180deg)" } }, icon(ICONS.chevron, 16))),
       // ---------- 弹窗 ----------
-      modal ? renderModal(modal, { t: t2, sources, busy, setModal, mutate, toast }) : null
+      modal ? renderModal(modal, { t: t2, sources, busy, setModal, mutate, toast, refresh }) : null
     );
   }
   function renderModal(modal, ctx) {
@@ -8434,6 +8790,8 @@
         return h(RootPathModal, { modal, t: t2, close, mutate, toast: ctx.toast });
       case "customSource":
         return h(CustomSourceModal, { t: t2, close, mutate });
+      case "catalog":
+        return h(CatalogModal, { t: t2, sources: ctx.sources, refresh: ctx.refresh, toast: ctx.toast, close });
       case "edit":
         return h(EditServerModal, { modal, t: t2, sources: ctx.sources, close, mutate });
     }
@@ -8662,6 +9020,803 @@
         { className: "dmm-modal-foot" },
         h("button", { className: "dmm-btn dmm-btn-secondary", onClick: close }, t2("cancel")),
         h("button", { className: "dmm-btn dmm-btn-primary", onClick: () => mutate("/custom-source-add", { path, label }, t2("toastSaved")) }, t2("save"))
+      )
+    );
+  }
+  function CatalogModal(props) {
+    const { t: t2, sources, refresh, toast, close } = props;
+    const isZh = t2("title") === ZH.title;
+    const [tab, setTab] = useState("registry");
+    const [query, setQuery] = useState("");
+    const [results, setResults] = useState(null);
+    const [nextCursor, setNextCursor] = useState(void 0);
+    const [loading, setLoading] = useState(false);
+    const [loadingMore, setLoadingMore] = useState(false);
+    const [error, setError] = useState(null);
+    const [installEntry, setInstallEntry] = useState(null);
+    const [detailEntry, setDetailEntry] = useState(null);
+    const [confirm, setConfirm] = useState(null);
+    const [busy, setBusy] = useState(null);
+    const [searched, setSearched] = useState(false);
+    const [rankings, setRankings] = useState(null);
+    const [rankLoading, setRankLoading] = useState(false);
+    const [rankError, setRankError] = useState(null);
+    const [rankQuery, setRankQuery] = useState("");
+    const [wbStatus, setWbStatus] = useState(null);
+    const [workbuddy, setWorkbuddy] = useState(null);
+    const [wbLoading, setWbLoading] = useState(false);
+    const [wbError, setWbError] = useState(null);
+    const [wbQuery, setWbQuery] = useState("");
+    const [rankDetailLoading, setRankDetailLoading] = useState(null);
+    const runSearch = useCallback(async (keyword, cursor) => {
+      if (cursor) setLoadingMore(true);
+      else setLoading(true);
+      setError(null);
+      try {
+        const payload = await callApi(
+          `/catalog/search?q=${encodeURIComponent(keyword)}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`
+        );
+        const items = Array.isArray(payload) ? payload : payload.items;
+        if (!Array.isArray(items)) throw new Error("catalog search returned an unexpected shape \u2014 restart DSH to reload the host routes");
+        setResults((current) => cursor && current ? [...current, ...items] : items);
+        setNextCursor(Array.isArray(payload) ? void 0 : payload.nextCursor);
+      } catch (caught) {
+        setError(`${t2("catalogFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+      } finally {
+        setLoading(false);
+        setLoadingMore(false);
+        setSearched(true);
+      }
+    }, [t2]);
+    useEffect(() => {
+      if (tab === "registry" && !searched && !loading) void runSearch("");
+    }, [tab, searched, loading, runSearch]);
+    useEffect(() => {
+      let alive = true;
+      callApi("/catalog/workbuddy/status").then((status) => {
+        if (alive) setWbStatus(status);
+      }).catch(() => {
+        if (alive) setWbStatus({ available: false, count: 0, installable: 0 });
+      });
+      return () => {
+        alive = false;
+      };
+    }, []);
+    const loadRankings = useCallback(async () => {
+      setRankLoading(true);
+      setRankError(null);
+      try {
+        setRankings(await callApi("/catalog/rankings"));
+      } catch (caught) {
+        setRankError(`${t2("catalogMcpsoFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+      } finally {
+        setRankLoading(false);
+      }
+    }, [t2]);
+    const loadWorkbuddy = useCallback(async () => {
+      setWbLoading(true);
+      setWbError(null);
+      try {
+        setWorkbuddy(await callApi("/catalog/workbuddy"));
+      } catch (caught) {
+        setWbError(`${t2("catalogWorkbuddyFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+      } finally {
+        setWbLoading(false);
+      }
+    }, [t2]);
+    useEffect(() => {
+      if (tab === "mcpso" && !rankings && !rankLoading && !rankError) void loadRankings();
+    }, [tab, rankings, rankLoading, rankError, loadRankings]);
+    useEffect(() => {
+      if (tab === "workbuddy" && wbStatus?.available && !workbuddy && !wbLoading && !wbError) void loadWorkbuddy();
+    }, [tab, wbStatus, workbuddy, wbLoading, wbError, loadWorkbuddy]);
+    const openRankingDetail = useCallback(async (item, mode) => {
+      setRankDetailLoading(item.id);
+      try {
+        const detail = await callApi(`/catalog/ranking-detail?slug=${encodeURIComponent(item.id)}`);
+        const entry = {
+          id: detail.id || item.id,
+          title: detail.title ?? item.title,
+          description: detail.description ?? item.description ?? "",
+          descriptionZh: detail.description ?? item.description,
+          source: "mcpso",
+          transport: detail.serverUrl ? "http" : "stdio",
+          command: detail.command,
+          args: detail.args,
+          env: detail.env,
+          url: detail.serverUrl,
+          headers: detail.headers,
+          fields: detail.fields ?? [],
+          extra: detail.extra,
+          repository: detail.repository,
+          websiteUrl: item.url,
+          installable: detail.installable,
+          warning: detail.installable ? detail.warning : t2("catalogRankNoConfig"),
+          tags: ["mcp.so"]
+        };
+        if (mode === "install" && entry.installable !== false) setInstallEntry(entry);
+        else setDetailEntry(entry);
+      } catch (caught) {
+        toast(`${t2("catalogRankDetailFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+      } finally {
+        setRankDetailLoading(null);
+      }
+    }, [t2, toast]);
+    const installationsOf = (entry) => sources.flatMap(
+      (source) => source.servers.filter((server) => matchesCatalogEntry(entry, server.name, server.spec)).map((server) => ({ source, server }))
+    );
+    const toggleOne = async (source, server) => {
+      const key = `toggle:${source.key}/${server.name}`;
+      setBusy(key);
+      try {
+        await callApi(server.enabled ? "/disable" : "/enable", {
+          method: "POST",
+          headers: MUTATION_HEADERS,
+          body: JSON.stringify({ source: source.key, name: server.name })
+        });
+        await refresh();
+      } catch (caught) {
+        toast(`${t2("toastFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+      } finally {
+        setBusy(null);
+      }
+    };
+    const uninstallOne = async (source, server) => {
+      const key = `delete:${source.key}/${server.name}`;
+      setBusy(key);
+      try {
+        await callApi("/delete", {
+          method: "POST",
+          headers: MUTATION_HEADERS,
+          body: JSON.stringify({ source: source.key, name: server.name })
+        });
+        toast(t2("catalogUninstallDone"));
+        setConfirm(null);
+        await refresh();
+      } catch (caught) {
+        toast(`${t2("toastFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+      } finally {
+        setBusy(null);
+      }
+    };
+    if (installEntry) {
+      return h(CatalogInstallView, {
+        entry: installEntry,
+        t: t2,
+        sources,
+        toast,
+        refresh,
+        isZh,
+        onBack: () => setInstallEntry(null),
+        close
+      });
+    }
+    if (detailEntry) {
+      return h(CatalogDetailView, {
+        entry: detailEntry,
+        t: t2,
+        isZh,
+        close,
+        installed: installationsOf(detailEntry),
+        onBack: () => setDetailEntry(null),
+        onInstall: () => {
+          setDetailEntry(null);
+          setInstallEntry(detailEntry);
+        }
+      });
+    }
+    const card = (entry) => {
+      const installed = installationsOf(entry);
+      return h(
+        "div",
+        { className: "dmm-catalog-card", key: entry.id },
+        h(
+          "div",
+          { className: "dmm-catalog-main" },
+          h(
+            "div",
+            { className: "dmm-catalog-title" },
+            isZh ? entry.title : entry.titleEn ?? entry.title,
+            h("span", { className: "dmm-tag gray" }, entry.transport),
+            entry.source === "official" ? h("span", { className: "dmm-tag blue" }, t2("catalogOfficial")) : entry.source === "registry" ? h("span", { className: "dmm-tag cyan" }, t2("catalogRegistry")) : entry.source === "mcpso" ? h("span", { className: "dmm-tag accent" }, t2("catalogMcpso")) : h("span", { className: "dmm-tag purple" }, t2("catalogWorkbuddy")),
+            entry.installable === false ? h("span", { className: "dmm-tag yellow" }, t2("catalogCliOnly")) : null,
+            installed.length ? h("span", { className: "dmm-tag green" }, `${t2("catalogInstalled")} ${installed.length}`) : null
+          ),
+          h("div", { className: "dmm-catalog-desc" }, isZh ? entry.descriptionZh ?? entry.description : entry.description),
+          entry.packageId || entry.repository ? h(
+            "div",
+            { className: "dmm-catalog-meta" },
+            entry.packageId ? h("code", null, entry.packageId) : null,
+            entry.repository ? h("a", {
+              className: "dmm-link",
+              href: entry.repository,
+              target: "_blank",
+              rel: "noreferrer noopener",
+              onClick: (e) => e.stopPropagation()
+            }, t2("catalogRepository")) : null
+          ) : null,
+          entry.warning && entry.source !== "official" ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
+          installed.length ? h("div", { className: "dmm-catalog-installs" }, installed.map(({ source, server }) => {
+            const rowKey = `${source.key}/${server.name}`;
+            return h(
+              "div",
+              { className: "dmm-catalog-install", key: rowKey },
+              h("span", { className: "dmm-tag " + (server.enabled ? "green" : "gray") }, source.label),
+              h("span", { className: "grow dmm-catalog-install-name" }, `${server.name} \xB7 ${server.enabled ? t2("enabledTag") : t2("disabledTag")}`),
+              h("button", {
+                className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                disabled: busy === `toggle:${rowKey}`,
+                onClick: () => void toggleOne(source, server)
+              }, server.enabled ? t2("switchDisable") : t2("switchEnable")),
+              confirm === rowKey ? h("button", {
+                className: "dmm-btn dmm-btn-danger dmm-btn-sm",
+                disabled: busy === `delete:${rowKey}`,
+                onClick: () => void uninstallOne(source, server)
+              }, t2("catalogConfirmUninstall")) : h("button", {
+                className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                onClick: () => setConfirm(rowKey)
+              }, t2("catalogUninstall"))
+            );
+          })) : null
+        ),
+        h(
+          "div",
+          { className: "dmm-catalog-actions" },
+          h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: () => setDetailEntry(entry) }, t2("catalogDetails")),
+          entry.installable === false ? null : h("button", { className: "dmm-btn dmm-btn-primary dmm-btn-sm", onClick: () => setInstallEntry(entry) }, t2("catalogInstall"))
+        )
+      );
+    };
+    const rankCard = (item) => h(
+      "div",
+      { className: "dmm-rank-card", key: item.id },
+      h("span", { className: "dmm-rank-no" }, String(item.rank)),
+      h(
+        "div",
+        { className: "dmm-catalog-main" },
+        h(
+          "div",
+          { className: "dmm-catalog-title" },
+          item.title,
+          item.author ? h("span", { className: "dmm-rank-author" }, item.author) : null
+        ),
+        item.description ? h("div", { className: "dmm-catalog-desc" }, item.description) : null,
+        h(
+          "div",
+          { className: "dmm-rank-metrics" },
+          item.monthlySearches ? h("span", { className: "dmm-tag gray" }, `${t2("catalogRankMonthly")} ${item.monthlySearches}`) : null,
+          item.stars ? h("span", { className: "dmm-tag yellow" }, `\u2605 ${item.stars}`) : null,
+          item.score ? h("span", { className: "dmm-tag blue" }, `${t2("catalogRankScore")} ${item.score}`) : null,
+          h("a", {
+            className: "dmm-link",
+            href: item.url,
+            target: "_blank",
+            rel: "noreferrer noopener",
+            onClick: (e) => e.stopPropagation()
+          }, t2("catalogOpenOnMcpso"))
+        )
+      ),
+      h(
+        "div",
+        { className: "dmm-catalog-actions" },
+        h("button", {
+          className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+          disabled: rankDetailLoading === item.id,
+          onClick: () => void openRankingDetail(item, "detail")
+        }, rankDetailLoading === item.id ? t2("catalogRankDetailLoading") : t2("catalogDetails")),
+        h("button", {
+          className: "dmm-btn dmm-btn-primary dmm-btn-sm",
+          disabled: rankDetailLoading === item.id,
+          onClick: () => void openRankingDetail(item, "install")
+        }, t2("catalogInstall"))
+      )
+    );
+    const registryList = results ?? [];
+    const rankFilter = rankQuery.trim().toLowerCase();
+    const rankList = (rankings?.items ?? []).filter((item) => !rankFilter || `${item.title} ${item.author ?? ""} ${item.description ?? ""}`.toLowerCase().includes(rankFilter));
+    const wbFilter = wbQuery.trim().toLowerCase();
+    const wbList = (workbuddy?.items ?? []).filter((item) => !wbFilter || `${item.title} ${item.titleEn ?? ""} ${item.description} ${item.descriptionZh ?? ""} ${(item.examples ?? []).join(" ")}`.toLowerCase().includes(wbFilter));
+    const tabButton = (key, label) => h("button", { key, "aria-selected": tab === key, onClick: () => setTab(key) }, label);
+    const sourceLabel = tab === "registry" ? "MCP Registry" : tab === "mcpso" ? "mcp.so" : "WorkBuddy";
+    const showOfflineFallback = !wbStatus?.available && (tab === "registry" && Boolean(error) && registryList.length === 0 || tab === "mcpso" && Boolean(rankError) && !rankings?.items?.length);
+    return h(
+      ModalShell,
+      { onClose: close, wide: true },
+      h(
+        "div",
+        { className: "dmm-modal-head" },
+        h("div", { className: "dmm-modal-title" }, t2("catalogTitle")),
+        h(
+          "div",
+          { className: "dmm-segmented" },
+          tabButton("registry", t2("catalogRegistry")),
+          tabButton("mcpso", t2("catalogMcpso")),
+          wbStatus?.available ? tabButton("workbuddy", t2("catalogWorkbuddy")) : null
+        ),
+        h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))
+      ),
+      h(
+        "div",
+        { className: "dmm-modal-body" },
+        h("div", { className: "dmm-catalog-subtitle" }, t2("catalogSubtitle")),
+        tab === "registry" ? [
+          h(
+            "div",
+            { className: "dmm-catalog-search", key: "search" },
+            h("input", {
+              className: "dmm-input",
+              value: query,
+              placeholder: t2("catalogSearchPlaceholder"),
+              onChange: (e) => setQuery(e.target.value),
+              onKeyDown: (e) => {
+                if (e.key === "Enter") void runSearch(query);
+              }
+            }),
+            h("button", { className: "dmm-btn dmm-btn-secondary", onClick: () => void runSearch(query) }, icon(ICONS.search, 13), t2("catalogSearch"))
+          ),
+          h("div", { className: "dmm-field-hint", key: "hint" }, t2("catalogRegistryHint")),
+          !searched && !loading ? h("div", { className: "dmm-empty", key: "emptyq" }, t2("catalogEmptyQuery")) : null,
+          loading ? h("div", { className: "dmm-empty", key: "loading" }, t2("catalogLoading")) : null,
+          error ? h("div", { className: "dmm-warn", key: "error" }, error) : null,
+          !loading && !error && searched && registryList.length === 0 ? h("div", { className: "dmm-empty", key: "nores" }, t2("catalogNoResults")) : null,
+          h("div", { className: "dmm-catalog-list", key: "list" }, registryList.map(card)),
+          registryList.length ? h(
+            "div",
+            { className: "dmm-catalog-more", key: "more" },
+            h("span", { className: "dmm-field-hint" }, `${t2("catalogLoaded")} ${registryList.length}`),
+            nextCursor ? h("button", {
+              className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+              disabled: loadingMore,
+              onClick: () => void runSearch(query, nextCursor)
+            }, loadingMore ? t2("catalogLoading") : t2("catalogLoadMore")) : null
+          ) : null
+        ] : null,
+        tab === "mcpso" ? [
+          h("div", { className: "dmm-field-hint", key: "hint" }, t2("catalogMcpsoHint")),
+          h(
+            "div",
+            { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
+            h("input", {
+              className: "dmm-input",
+              value: rankQuery,
+              placeholder: `${t2("catalogFilter")}\u2026`,
+              onChange: (e) => setRankQuery(e.target.value)
+            })
+          ),
+          rankLoading ? h("div", { className: "dmm-empty", key: "loading" }, t2("catalogMcpsoLoading")) : null,
+          rankError && !rankings ? h(
+            "div",
+            { key: "error" },
+            h("div", { className: "dmm-warn" }, rankError),
+            h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadRankings() }, t2("catalogRetry"))
+          ) : null,
+          rankings?.stale ? h(
+            "div",
+            { className: "dmm-warn", key: "stale" },
+            `${t2("catalogMcpsoStale")}${rankings.error ? `\uFF08${rankings.error}\uFF09` : ""} \xB7 ${t2("catalogMcpsoFetched")} ${new Date(rankings.fetchedAt).toLocaleString()}`
+          ) : null,
+          rankings ? h(
+            "div",
+            { className: "dmm-field-hint", key: "fetched" },
+            `${t2("catalogMcpsoFetched")} ${new Date(rankings.fetchedAt).toLocaleString()}`
+          ) : null,
+          h("div", { className: "dmm-catalog-list", key: "list" }, rankList.map(rankCard)),
+          rankings && !rankList.length ? h("div", { className: "dmm-empty", key: "nores" }, t2("catalogNoResults")) : null
+        ] : null,
+        tab === "workbuddy" ? [
+          h("div", { className: "dmm-field-hint", key: "hint" }, t2("catalogWorkbuddyHint")),
+          workbuddy ? h(
+            "div",
+            { className: "dmm-field-hint", key: "summary" },
+            `${workbuddy.count} ${t2("catalogConnectorsUnit")} \xB7 ${t2("catalogInstallable")} ${workbuddy.installable} \xB7 ${new Date(workbuddy.fetchedAt).toLocaleString()}`
+          ) : null,
+          h(
+            "div",
+            { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
+            h("input", {
+              className: "dmm-input",
+              value: wbQuery,
+              placeholder: `${t2("catalogFilter")}\u2026`,
+              onChange: (e) => setWbQuery(e.target.value)
+            })
+          ),
+          wbLoading ? h("div", { className: "dmm-empty", key: "loading" }, t2("catalogWorkbuddyLoading")) : null,
+          wbError && !workbuddy ? h(
+            "div",
+            { key: "error" },
+            h("div", { className: "dmm-warn" }, wbError),
+            h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadWorkbuddy() }, t2("catalogRetry"))
+          ) : null,
+          h("div", { className: "dmm-catalog-list", key: "list" }, wbList.map(card)),
+          workbuddy && !wbList.length ? h("div", { className: "dmm-empty", key: "nores" }, t2("catalogNoResults")) : null,
+          !wbStatus?.available ? h("div", { className: "dmm-empty", key: "noWB" }, t2("catalogWbNotInstalled")) : null
+        ] : null,
+        showOfflineFallback ? h(
+          "div",
+          { className: "dmm-detail-section", key: "offline" },
+          h("div", { className: "dmm-detail-section-title" }, t2("catalogOfflineTitle")),
+          h("div", { className: "dmm-field-hint", style: { marginBottom: 6 } }, t2("catalogOfflineHint")),
+          h("div", { className: "dmm-catalog-list" }, OFFICIAL_CATALOG.map(card))
+        ) : null
+      ),
+      h(
+        "div",
+        { className: "dmm-modal-foot" },
+        h("span", { className: "dmm-field-hint", style: { marginRight: "auto" } }, sourceLabel),
+        h("button", { className: "dmm-btn dmm-btn-secondary", onClick: close }, t2("cancel"))
+      )
+    );
+  }
+  function renderInlineMarkdown(text, prefix) {
+    const out = [];
+    const re = /\[([^\]]+)\]\(([^)\s]+)\)|`([^`]+)`|\*\*([^*]+)\*\*/g;
+    let last = 0;
+    let match;
+    let index = 0;
+    while (match = re.exec(text)) {
+      if (match.index > last) out.push(text.slice(last, match.index));
+      if (match[1] !== void 0 && match[2] !== void 0) {
+        const href = match[2];
+        out.push(/^https?:\/\//i.test(href) ? h("a", { key: `${prefix}-a${index++}`, className: "dmm-link", href, target: "_blank", rel: "noreferrer noopener" }, match[1]) : match[1]);
+      } else if (match[3] !== void 0) {
+        out.push(h("code", { key: `${prefix}-c${index++}`, className: "dmm-md-code" }, match[3]));
+      } else if (match[4] !== void 0) {
+        out.push(h("strong", { key: `${prefix}-b${index++}` }, match[4]));
+      }
+      last = re.lastIndex;
+    }
+    if (last < text.length) out.push(text.slice(last));
+    return out;
+  }
+  function renderMarkdown(text) {
+    const all = text.replace(/\r\n/g, "\n").split("\n");
+    const lines = all.slice(0, 600);
+    const nodes = [];
+    let code = null;
+    let list = [];
+    let key = 0;
+    const flushList = () => {
+      if (!list.length) return;
+      nodes.push(h("ul", { className: "dmm-md-list", key: `ul${key++}` }, list));
+      list = [];
+    };
+    for (const line of lines) {
+      const fence = line.match(/^\s*```/);
+      if (fence) {
+        if (code) {
+          nodes.push(h("pre", { className: "dmm-code-block", key: `code${key++}` }, code.join("\n")));
+          code = null;
+        } else {
+          flushList();
+          code = [];
+        }
+        continue;
+      }
+      if (code) {
+        code.push(line);
+        continue;
+      }
+      if (!line.trim()) {
+        flushList();
+        continue;
+      }
+      const heading = line.match(/^(#{1,4})\s+(.*)$/);
+      if (heading) {
+        flushList();
+        const level = Math.min(heading[1].length, 3);
+        nodes.push(h("div", { className: `dmm-md-h${level}`, key: `h${key++}` }, renderInlineMarkdown(heading[2], `h${key}`)));
+        continue;
+      }
+      const item = line.match(/^\s*(?:[-*+]|\d+\.)\s+(.*)$/);
+      if (item) {
+        list.push(h("li", { key: `li${key++}` }, renderInlineMarkdown(item[1], `li${key}`)));
+        continue;
+      }
+      flushList();
+      nodes.push(h("div", { className: "dmm-md-p", key: `p${key++}` }, renderInlineMarkdown(line, `p${key}`)));
+    }
+    flushList();
+    if (code) nodes.push(h("pre", { className: "dmm-code-block", key: `code${key++}` }, code.join("\n")));
+    return h("div", { className: "dmm-readme" }, nodes);
+  }
+  function CatalogDetailView(props) {
+    const { entry, t: t2, isZh, installed, onBack, onInstall, close } = props;
+    const [readme, setReadme] = useState(null);
+    const [readmeError, setReadmeError] = useState(null);
+    const [readmeLoading, setReadmeLoading] = useState(Boolean(entry.repository));
+    useEffect(() => {
+      let alive = true;
+      if (!entry.repository) {
+        setReadmeLoading(false);
+        return;
+      }
+      setReadmeLoading(true);
+      callApi(`/catalog/readme?repo=${encodeURIComponent(entry.repository)}`).then((data) => {
+        if (!alive) return;
+        setReadme(data);
+        setReadmeError(null);
+      }).catch((caught) => {
+        if (alive) setReadmeError(caught instanceof Error ? caught.message : String(caught));
+      }).finally(() => {
+        if (alive) setReadmeLoading(false);
+      });
+      return () => {
+        alive = false;
+      };
+    }, [entry.repository]);
+    const fieldLabel = (field) => isZh ? field.label : field.labelEn ?? field.label;
+    const examples = (isZh ? entry.examples ?? entry.examplesEn : entry.examplesEn ?? entry.examples) ?? [];
+    const labelFor = (key) => {
+      const field = entry.fields.find((item) => item.key === key);
+      return field ? fieldLabel(field) : key;
+    };
+    const displayTemplate = (text) => text.replace(/\{\{([\w-]+)\}\}/g, (_, key) => `<${labelFor(key)}>`);
+    const command = [entry.command, ...(entry.args ?? []).map(displayTemplate)].filter(Boolean).join(" ");
+    const infoRow = (label, value) => value ? h(
+      "div",
+      { className: "dmm-detail-row", key: label },
+      h("span", { className: "dmm-detail-label" }, label),
+      h("span", { className: "dmm-detail-value" }, value)
+    ) : null;
+    const sectionTitle = (text) => h("div", { className: "dmm-detail-section-title" }, text);
+    return h(
+      ModalShell,
+      { onClose: close, wide: true },
+      h(
+        "div",
+        { className: "dmm-modal-head" },
+        h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: onBack }, t2("catalogBack")),
+        h("div", { className: "dmm-modal-title" }, isZh ? entry.title : entry.titleEn ?? entry.title),
+        h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))
+      ),
+      h(
+        "div",
+        { className: "dmm-modal-body" },
+        h(
+          "div",
+          { className: "dmm-catalog-title" },
+          h("span", { className: "dmm-tag gray" }, entry.transport),
+          entry.source === "official" ? h("span", { className: "dmm-tag blue" }, t2("catalogOfficial")) : entry.source === "registry" ? h("span", { className: "dmm-tag cyan" }, t2("catalogRegistry")) : entry.source === "mcpso" ? h("span", { className: "dmm-tag accent" }, t2("catalogMcpso")) : h("span", { className: "dmm-tag purple" }, t2("catalogWorkbuddy")),
+          entry.installable === false ? h("span", { className: "dmm-tag yellow" }, t2("catalogCliOnly")) : null,
+          ...(entry.tags ?? []).map((tag) => h("span", { className: "dmm-tag gray", key: tag }, tag))
+        ),
+        h("div", { className: "dmm-catalog-desc" }, isZh ? entry.descriptionZh ?? entry.description : entry.description),
+        entry.warning ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
+        examples.length ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogExamples")),
+          h(
+            "ul",
+            { className: "dmm-md-list" },
+            examples.map((example, index) => h("li", { key: index }, example))
+          )
+        ) : null,
+        entry.source !== "workbuddy" ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogReadme")),
+          readmeLoading ? h("div", { className: "dmm-field-hint" }, t2("catalogReadmeLoading")) : readme ? renderMarkdown(readme.text) : h(
+            "div",
+            { className: "dmm-field-hint" },
+            entry.repository ? `${t2("catalogReadmeFailed")}: ${readmeError ?? ""}` : t2("catalogNoRepo")
+          ),
+          readme?.truncated ? h("div", { className: "dmm-field-hint" }, t2("catalogReadmeTruncated")) : null,
+          readme && entry.repository ? h("a", { className: "dmm-link", href: entry.repository, target: "_blank", rel: "noreferrer noopener" }, t2("catalogViewOnGitHub")) : null
+        ) : null,
+        entry.source !== "workbuddy" ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogRepository")),
+          h(
+            "div",
+            { className: "dmm-detail-list" },
+            entry.repository ? h(
+              "div",
+              { className: "dmm-detail-row" },
+              h("span", { className: "dmm-detail-label" }, "Git"),
+              h("a", { className: "dmm-detail-value dmm-link", href: entry.repository, target: "_blank", rel: "noreferrer noopener" }, entry.repository)
+            ) : h("div", { className: "dmm-field-hint" }, t2("catalogNoRepo")),
+            entry.websiteUrl ? h(
+              "div",
+              { className: "dmm-detail-row" },
+              h("span", { className: "dmm-detail-label" }, t2("catalogWebsite")),
+              h("a", { className: "dmm-detail-value dmm-link", href: entry.websiteUrl, target: "_blank", rel: "noreferrer noopener" }, entry.websiteUrl)
+            ) : null,
+            entry.docUrl ? h(
+              "div",
+              { className: "dmm-detail-row" },
+              h("span", { className: "dmm-detail-label" }, t2("catalogGetCredential")),
+              h(
+                "a",
+                { className: "dmm-detail-value dmm-link", href: entry.docUrl, target: "_blank", rel: "noreferrer noopener" },
+                isZh ? entry.docLabel ?? entry.docUrl : entry.docLabelEn ?? entry.docLabel ?? entry.docUrl
+              )
+            ) : null
+          )
+        ) : entry.docUrl ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogGetCredential")),
+          h(
+            "a",
+            { className: "dmm-link", href: entry.docUrl, target: "_blank", rel: "noreferrer noopener" },
+            isZh ? entry.docLabel ?? entry.docUrl : entry.docLabelEn ?? entry.docLabel ?? entry.docUrl
+          )
+        ) : null,
+        h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogBasicInfo")),
+          h(
+            "div",
+            { className: "dmm-detail-grid" },
+            infoRow(t2("catalogPackage"), entry.packageId),
+            infoRow(t2("catalogTransport"), entry.transport),
+            infoRow(t2("catalogRegistryName"), entry.registryName)
+          )
+        ),
+        command ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogCommand")),
+          h("pre", { className: "dmm-code-block" }, command),
+          h("div", { className: "dmm-field-hint" }, t2("catalogDetailHint"))
+        ) : null,
+        entry.fields.length ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogParams")),
+          h("div", { className: "dmm-detail-list" }, entry.fields.map((field) => h(
+            "div",
+            { className: "dmm-detail-row", key: field.key },
+            h("span", { className: "dmm-detail-label" }, fieldLabel(field), field.required ? h("span", { className: "dmm-req" }, " *") : null),
+            h("span", { className: "dmm-detail-value" }, field.description ?? (field.kind === "lines" ? "\u6BCF\u884C\u4E00\u4E2A / one per line" : ""))
+          )))
+        ) : null,
+        entry.env && Object.keys(entry.env).length ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogEnvVars")),
+          h("div", { className: "dmm-detail-list" }, Object.keys(entry.env).map((key) => {
+            const field = entry.fields.find((item) => item.key === key);
+            return h(
+              "div",
+              { className: "dmm-detail-row", key },
+              h("span", { className: "dmm-detail-label" }, h("code", null, key)),
+              h("span", { className: "dmm-detail-value" }, field?.description ?? (field?.required ? "required" : ""))
+            );
+          }))
+        ) : null,
+        installed.length ? h(
+          "div",
+          { className: "dmm-detail-section" },
+          sectionTitle(t2("catalogInstalledIn")),
+          h("div", { className: "dmm-detail-list" }, installed.map(({ source, server }) => h(
+            "div",
+            { className: "dmm-detail-row", key: `${source.key}/${server.name}` },
+            h("span", { className: "dmm-detail-label" }, source.label),
+            h("span", { className: "dmm-detail-value" }, `${server.name} \xB7 ${server.enabled ? t2("enabledTag") : t2("disabledTag")}`)
+          )))
+        ) : null
+      ),
+      h(
+        "div",
+        { className: "dmm-modal-foot" },
+        h("button", { className: "dmm-btn dmm-btn-secondary", style: { marginRight: "auto" }, onClick: onBack }, t2("cancel")),
+        entry.installable === false ? null : h("button", { className: "dmm-btn dmm-btn-primary", onClick: onInstall }, icon(ICONS.plug, 13), t2("catalogInstall"))
+      )
+    );
+  }
+  function CatalogInstallView(props) {
+    const { entry, t: t2, sources, toast, refresh, isZh, onBack, close } = props;
+    const writable = sources.filter((source) => source.writable && !source.error);
+    const fixedTarget = entry.installTarget;
+    const fixedSource = fixedTarget ? sources.find((source) => source.key === fixedTarget) : null;
+    const [targets, setTargets] = useState(() => fixedTarget ? [fixedTarget] : writable.slice(0, 1).map((source) => source.key));
+    const [name, setName] = useState(entry.id);
+    const [values, setValues] = useState(() => Object.fromEntries(entry.fields.map((field) => [field.key, field.default ?? ""])));
+    const [busy, setBusy] = useState(false);
+    const missing = entry.fields.filter((field) => field.required && !(values[field.key] ?? "").trim());
+    const canInstall = targets.length > 0 && name.trim().length > 0 && missing.length === 0 && !busy;
+    const submit = async () => {
+      if (!canInstall) return;
+      setBusy(true);
+      try {
+        const spec = expandCatalogSpec(entry, values);
+        const result = await callApi("/catalog/install", {
+          method: "POST",
+          headers: MUTATION_HEADERS,
+          body: JSON.stringify({ name: name.trim(), targets, spec })
+        });
+        const failed = (result.results ?? []).filter((item) => item.ok === false);
+        if (failed.length) {
+          toast(`${t2("catalogPartial")}: ${failed.map((item) => `${item.source}: ${item.error ?? ""}`).join("; ")}`, true);
+        } else {
+          toast(t2("catalogInstallDone"));
+          onBack();
+        }
+        await refresh();
+      } catch (caught) {
+        toast(`${t2("toastFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+      } finally {
+        setBusy(false);
+      }
+    };
+    const fieldLabel = (field) => isZh ? field.label : field.labelEn ?? field.label;
+    return h(
+      ModalShell,
+      { onClose: close, wide: true },
+      h(
+        "div",
+        { className: "dmm-modal-head" },
+        h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: onBack }, t2("catalogBack")),
+        h("div", { className: "dmm-modal-title" }, `${t2("catalogInstall")} \xB7 ${isZh ? entry.title : entry.titleEn ?? entry.title}`),
+        h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))
+      ),
+      h(
+        "div",
+        { className: "dmm-modal-body" },
+        h("div", { className: "dmm-catalog-desc" }, isZh ? entry.descriptionZh ?? entry.description : entry.description),
+        entry.warning ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
+        h(
+          "div",
+          { className: "dmm-field" },
+          h("label", { className: "dmm-field-label" }, t2("catalogTargets")),
+          fixedTarget ? h("div", { className: "dmm-field-hint" }, `${t2("catalogFixedTarget")} \xB7 ${fixedSource?.label ?? fixedTarget}`) : writable.length ? h("div", { className: "dmm-check-list" }, writable.map((source) => {
+            const checked = targets.includes(source.key);
+            return h(
+              "label",
+              { className: "dmm-check", key: source.key },
+              h("input", {
+                type: "checkbox",
+                checked,
+                onChange: (e) => setTargets((current) => e.target.checked ? [...current, source.key] : current.filter((key) => key !== source.key))
+              }),
+              h("span", null, source.label)
+            );
+          })) : h("div", { className: "dmm-field-hint" }, t2("catalogNoTargets"))
+        ),
+        h(
+          "div",
+          { className: "dmm-field" },
+          h("label", { className: "dmm-field-label" }, t2("catalogName")),
+          h("input", { className: "dmm-input", value: name, onChange: (e) => setName(e.target.value) })
+        ),
+        entry.fields.map((field) => h(
+          "div",
+          { className: "dmm-field", key: field.key },
+          h("label", { className: "dmm-field-label" }, fieldLabel(field), field.required ? h("span", { className: "dmm-req" }, " *") : null),
+          field.kind === "lines" ? h("textarea", {
+            className: "dmm-textarea",
+            style: { minHeight: 64 },
+            value: values[field.key] ?? "",
+            placeholder: field.placeholder ?? "",
+            onChange: (e) => setValues((current) => ({ ...current, [field.key]: e.target.value }))
+          }) : h("input", {
+            className: "dmm-input",
+            type: field.secret ? "password" : "text",
+            value: values[field.key] ?? "",
+            placeholder: field.placeholder ?? "",
+            onChange: (e) => setValues((current) => ({ ...current, [field.key]: e.target.value }))
+          }),
+          field.description ? h("div", { className: "dmm-field-hint" }, field.description) : null
+        )),
+        entry.docUrl ? h(
+          "div",
+          { className: "dmm-field" },
+          h(
+            "a",
+            { className: "dmm-link", href: entry.docUrl, target: "_blank", rel: "noreferrer noopener" },
+            isZh ? entry.docLabel ?? entry.docUrl : entry.docLabelEn ?? entry.docLabel ?? entry.docUrl
+          )
+        ) : null
+      ),
+      h(
+        "div",
+        { className: "dmm-modal-foot" },
+        h("button", { className: "dmm-btn dmm-btn-secondary", onClick: onBack }, t2("cancel")),
+        entry.installable === false ? null : h("button", { className: "dmm-btn dmm-btn-primary", disabled: !canInstall, onClick: () => void submit() }, t2("catalogInstall"))
       )
     );
   }

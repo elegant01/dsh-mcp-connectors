@@ -17,8 +17,14 @@ import {
   removeCustomSource,
   openFolder,
   setOrder,
+  installCatalogServers,
+  uninstallCatalogServers,
   managerDir,
+  type CatalogInstallSpec,
 } from "./core.js";
+import { fetchGitHubReadme, searchRegistry } from "./registry.js";
+import { fetchRankingDetail, fetchRankings } from "./mcpso.js";
+import { loadWorkBuddyCatalog, workbuddyStatus } from "./workbuddy.js";
 import { join } from "node:path";
 
 interface HostContext {
@@ -162,6 +168,89 @@ export function apply(ctx: HostContext) {
       path: `${API_PREFIX}/state`,
       methods: ["GET", "HEAD"],
       fetch: (req: Request) => runFetch(() => snapshot(), req.method === "HEAD"),
+    },
+    {
+      // 只读：代理官方 MCP Registry 搜索（固定域名 + 10 分钟缓存 + 游标分页）
+      path: `${API_PREFIX}/catalog/search`,
+      methods: ["GET"],
+      fetch: (req: Request) => runFetch(() => {
+        let q = "";
+        let cursor = "";
+        try {
+          const url = new URL(req.url);
+          q = url.searchParams.get("q") ?? "";
+          cursor = url.searchParams.get("cursor") ?? "";
+        } catch { /* 空查询即可 */ }
+        return searchRegistry(q, cursor || undefined);
+      }),
+    },
+    {
+      // 只读：按需抓取仓库 README（只允许 github.com，固定转到 raw.githubusercontent.com）
+      path: `${API_PREFIX}/catalog/readme`,
+      methods: ["GET"],
+      fetch: (req: Request) => runFetch(async () => {
+        let repo = "";
+        try { repo = new URL(req.url).searchParams.get("repo") ?? ""; } catch { /* 缺少参数 */ }
+        const readme = await fetchGitHubReadme(repo);
+        if (!readme) {
+          const error: CodedError = new Error("没有找到该仓库的 README（或不是 GitHub 仓库）");
+          error.statusCode = 404;
+          error.code = "error.catalog.readme";
+          throw error;
+        }
+        return readme;
+      }),
+    },
+    {
+      // 只读：mcp.so 热门 Top 100（只抓排行榜页，遵守 robots.txt 不碰 /search）
+      path: `${API_PREFIX}/catalog/rankings`,
+      methods: ["GET"],
+      fetch: () => runFetch(() => fetchRankings()),
+    },
+    {
+      // 只读：mcp.so 详情页（按需解析 mcpServers 配置，支持一键安装）
+      path: `${API_PREFIX}/catalog/ranking-detail`,
+      methods: ["GET"],
+      fetch: (req: Request) => runFetch(async () => {
+        let slug = "";
+        try { slug = new URL(req.url).searchParams.get("slug") ?? ""; } catch { /* 缺少参数 */ }
+        if (!slug) {
+          const error: CodedError = new Error("缺少 slug 参数");
+          error.statusCode = 400;
+          error.code = "error.catalog.slug";
+          throw error;
+        }
+        return fetchRankingDetail(slug);
+      }),
+    },
+    {
+      // 只读：本机 WorkBuddy 连接器市场是否可用（没装 WorkBuddy 时面板不显示来源）
+      path: `${API_PREFIX}/catalog/workbuddy/status`,
+      methods: ["GET"],
+      fetch: () => runFetch(() => workbuddyStatus()),
+    },
+    {
+      // 只读：本机 WorkBuddy 连接器列表
+      path: `${API_PREFIX}/catalog/workbuddy`,
+      methods: ["GET"],
+      fetch: () => runFetch(() => loadWorkBuddyCatalog()),
+    },
+    {
+      path: `${API_PREFIX}/catalog/install`,
+      methods: ["POST"],
+      fetch: (req: Request) => handlePost(req, (b) => installCatalogServers({
+        name: String(b.name || ""),
+        targets: Array.isArray(b.targets) ? (b.targets as string[]) : [],
+        spec: (b.spec && typeof b.spec === "object" ? b.spec : undefined) as CatalogInstallSpec | undefined,
+      }, log)),
+    },
+    {
+      path: `${API_PREFIX}/catalog/uninstall`,
+      methods: ["POST"],
+      fetch: (req: Request) => handlePost(req, (b) => uninstallCatalogServers({
+        name: String(b.name || ""),
+        targets: Array.isArray(b.targets) ? (b.targets as string[]) : [],
+      }, log)),
     },
     {
       path: `${API_PREFIX}/enable`,

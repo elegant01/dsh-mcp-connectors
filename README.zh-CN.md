@@ -24,10 +24,11 @@
 ## 功能
 
 - **自动发现**——扫描 `~`、`%APPDATA%`、`%LOCALAPPDATA%`（macOS / Linux 对应目录同样覆盖），按文件名**和**文件内容双重判据识别（`mcpServers` / `mcp` 键、`[mcp_servers]` 节区）。常规开发机首扫约 250ms，之后走缓存。
-- **多格式**——JSON（`mcpServers`）、OpenCode 风格（`mcp`）、Codex TOML（`[mcp_servers.*]` 按节区重写，注释和其它配置逐字节保留）、以及 JSONC（注释 / 尾逗号）。
+- **多格式**——JSON（`mcpServers`）、OpenCode 风格（`mcp`）、Codex TOML（`[mcp_servers.*]`）、DSH 的 `cordis.patch.yml`（`@deepseek-ai/dsh-mcp-client` 条目），以及 JSONC（注释 / 尾逗号）。TOML / YAML 都只重写目标条目，注释和其它配置逐字节保留。
 - **安全写入**——每次写入前把原文件快照到 `~/.dsh/mcp-connectors/backups/`（保留最近 100 份），任意版本一键恢复；恢复前也会先备份当前内容。
-- **启停**——各家 MCP 没有统一的 `disabled` 字段，所以停用 = 条目移出配置文件、定义存进管理器状态；启用再写回。
+- **启停**——DSH 条目有原生 `disabled` 字段，直接改这一行；其它工具没有统一字段，停用 = 条目移出配置文件、定义存进管理器状态，启用再写回。
 - **产品归组**——配置分散在多个文件里的工具（如 WorkBuddy 用户级 + 连接器）合成一张卡片，但每台 server 仍绑定自己的文件。
+- **连接器目录**——三个来源：官方 [MCP Registry](https://registry.modelcontextprotocol.io/)（在线搜索 + 分页）、[mcp.so 热门 Top 100](https://mcp.so/zh/rankings/servers)（可详情、可安装，带离线缓存），以及本机 **WorkBuddy 官方连接器市场**（MCP 类型可装回 WorkBuddy，CLI 类型仅展示）。勾选目标 Agent、填好参数后一键安装，已安装的直接启停或卸载。每个条目有详情页（仓库 / 官网地址、README、启动命令、环境变量、参数）。在线来源都不可用且本机没有 WorkBuddy 时，才会露出内置的 7 个官方参考实现作为断网兜底。
 - **拖拽排序**——顺序只存在插件状态里，配置文件一个字节都不动。
 - **适配设置页的面板**——竖向布局、区块头吸顶、分组可折叠、状态 / Agent 筛选、回到顶部，明暗主题跟随宿主。
 
@@ -37,7 +38,8 @@
 
 | Agent | 路径 | 格式 |
 | --- | --- | --- |
-| DSH | `~/.dsh/mcp.json` | JSON `mcpServers` |
+| DSH | `~/.dsh/profiles/<profile>/cordis.patch.yml` | YAML `@deepseek-ai/dsh-mcp-client` 条目 |
+| DSH（旧版兼容） | `~/.dsh/mcp.json` | JSON `mcpServers` |
 | Claude Code | `~/.claude.json` | JSON `mcpServers` |
 | Codex | `~/.codex/config.toml` | TOML `[mcp_servers.*]` |
 | Cursor | `~/.cursor/mcp.json` | JSON `mcpServers` |
@@ -75,7 +77,9 @@ dsh plugin --profile web add https://github.com/elegant01/dsh-mcp-connectors
 
 - 所有写接口要求自定义头 + `application/json` + 同源 `Origin`，宿主 `connection.fetch` 门禁照常生效；
 - 写操作串行执行，写前必备份；
-- 删除服务器只删目标条目，文件里的其它键原样保留（JSON 重序列化，Codex TOML 按节区重写）。
+- 删除服务器只删目标条目，文件里的其它键原样保留（JSON 重序列化，Codex TOML 按节区重写，DSH YAML 只替换目标条目的 `config:` 块）。
+- 连接器在线发现只访问固定域名 `registry.modelcontextprotocol.io`（结果缓存 10 分钟）；mcp.so 只读取允许抓取的排行榜页与详情页（缓存 30 分钟，遵守 robots.txt，不碰 `/search`）；WorkBuddy 连接器只读本机市场缓存。插件不会自动安装或运行任何服务器，必须由你在面板里确认目标 Agent 和参数。
+- WorkBuddy 连接器安装时保留 `${VAR}` 凭据占位符，真实密钥仍由 WorkBuddy 自己的 key store 保管，插件不会写入明文凭据。
 
 ## 开发
 

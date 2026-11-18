@@ -3,17 +3,23 @@
 //  - json-mcpServers: JSON 文件，服务器表在顶层 mcpServers（绝大多数）
 //  - json-mcp:        JSON 文件，服务器表在顶层 mcp（opencode / crush）
 //  - toml-codex:      Codex 系 config.toml，服务器表在 [mcp_servers.<name>] 节区
+//  - cordis-yaml:     DSH profile 的 cordis.patch.yml，@deepseek-ai/dsh-mcp-client 插件条目
+//                     （路径按 profile 动态生成，见 core.ts 的 cordisProfileSources）
 // 检测是优雅的：文件不存在的来源不会出现在面板里，路径猜错不造成任何副作用。
 
 import type { SourceDef } from "./types.js";
 
 export const BUILTIN_SOURCES: SourceDef[] = [
   {
+    // 旧版/兼容路径；当前 DSH 的 MCP 实际在 ~/.dsh/profiles/<profile>/cordis.patch.yml，
+    // 由 core.ts 的 cordisProfileSources() 动态列出。
     key: "dsh",
-    label: "DSH",
+    label: "DSH（mcp.json）",
     format: "json-mcpServers",
     paths: ["~/.dsh/mcp.json", "~/.dsh/mcpServers.json"],
     writable: true,
+    group: "dsh",
+    groupLabel: "DSH",
   },
   {
     key: "claude",

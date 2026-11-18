@@ -5,6 +5,10 @@
 import * as React from "react";
 import { BOARD_CSS } from "./board-css.js";
 import { AGENT_ICONS } from "./agent-icons.js";
+import {
+  OFFICIAL_CATALOG, matchesCatalogEntry, expandCatalogSpec,
+  type CatalogEntry, type CatalogField, type RankingEntry,
+} from "./catalog-data.js";
 
 const h = React.createElement;
 const { useCallback, useEffect, useMemo, useRef, useState } = React;
@@ -120,6 +124,80 @@ export const ZH: Dict = {
   themeToggle: "切换主题",
   openFolder: "打开所在文件夹",
   backToTop: "回到顶部",
+  discover: "发现连接器",
+  catalogTitle: "发现连接器",
+  catalogSubtitle: "从 MCP Registry、mcp.so 或 WorkBuddy 市场发现连接器，选中 Agent 后一键安装",
+  catalogOfficial: "官方参考",
+  catalogRegistry: "在线发现",
+  catalogSearchPlaceholder: "搜索 MCP Registry（名称 / 描述）…",
+  catalogSearch: "搜索",
+  catalogRegistryHint: "数据来自官方 MCP Registry。安装前请确认来源可信——它会在对应 Agent 启动时运行。",
+  catalogInstall: "安装",
+  catalogInstalled: "已安装",
+  catalogUninstall: "卸载",
+  catalogConfirmUninstall: "确认卸载",
+  catalogTargets: "安装到",
+  catalogName: "服务器名称",
+  catalogNoTargets: "没有可写入的 Agent 配置。",
+  catalogNoResults: "没有匹配的连接器。",
+  catalogLoading: "正在连接 MCP Registry…",
+  catalogFailed: "加载失败",
+  catalogRequired: "必填",
+  catalogInstallDone: "安装完成",
+  catalogUninstallDone: "已卸载",
+  catalogPartial: "部分目标失败",
+  catalogBack: "返回列表",
+  catalogEmptyQuery: "输入关键词搜索，或直接浏览最新收录。",
+  catalogSourceRepo: "modelcontextprotocol/servers",
+  catalogDetails: "详情",
+  catalogRepository: "仓库地址",
+  catalogWebsite: "官网 / 文档",
+  catalogCommand: "启动命令",
+  catalogPackage: "包",
+  catalogTransport: "传输方式",
+  catalogRegistryName: "Registry 名称",
+  catalogEnvVars: "环境变量",
+  catalogParams: "安装参数",
+  catalogInstalledIn: "已安装于",
+  catalogBasicInfo: "基本信息",
+  catalogNoRepo: "该条目没有附带仓库地址（可能是托管服务）。",
+  catalogDetailHint: "参数里的 <…> 表示安装时需要填写的字段。",
+  catalogReadme: "README",
+  catalogReadmeLoading: "正在读取仓库 README…",
+  catalogReadmeFailed: "README 读取失败",
+  catalogReadmeTruncated: "README 过长，仅显示前 600 行；完整内容请到 GitHub 查看。",
+  catalogViewOnGitHub: "在 GitHub 查看",
+  catalogLoadMore: "加载更多",
+  catalogLoaded: "已加载",
+  catalogOfficialHint: "官方仓库只维护少量参考实现。完整目录请切到「在线发现」（官方 MCP Registry，收录数千个可安装服务器）。",
+  catalogMcpso: "mcp.so 热门",
+  catalogMcpsoHint: "只展示 mcp.so 排行榜 Top 100（只读），点条目跳转 mcp.so 看详情。",
+  catalogMcpsoLoading: "正在读取 mcp.so 排行榜…",
+  catalogMcpsoFailed: "mcp.so 排行榜加载失败",
+  catalogMcpsoStale: "当前无法访问 mcp.so，显示的是上次成功抓取的缓存。",
+  catalogMcpsoFetched: "抓取时间",
+  catalogOpenOnMcpso: "在 mcp.so 查看",
+  catalogRankMonthly: "月搜",
+  catalogRankStars: "星标",
+  catalogRankScore: "评分",
+  catalogWorkbuddy: "WorkBuddy 连接器",
+  catalogWorkbuddyHint: "读取本机 WorkBuddy 官方连接器市场；MCP 类型可安装到 WorkBuddy，CLI 类型仅展示。",
+  catalogWorkbuddyLoading: "正在读取 WorkBuddy 连接器…",
+  catalogWorkbuddyFailed: "WorkBuddy 连接器读取失败",
+  catalogInstallable: "可安装",
+  catalogCliOnly: "CLI（仅 WorkBuddy）",
+  catalogFilter: "筛选",
+  catalogRetry: "重试",
+  catalogExamples: "使用示例",
+  catalogGetCredential: "获取凭据 / 查看文档",
+  catalogFixedTarget: "安装目标固定为 WorkBuddy",
+  catalogWbNotInstalled: "未检测到 WorkBuddy 连接器市场。",
+  catalogConnectorsUnit: "个连接器",
+  catalogOfflineTitle: "离线可用的内置参考实现",
+  catalogOfflineHint: "在线来源都不可用，且本机没有 WorkBuddy 连接器；下面这 7 个官方参考实现不需要联网即可安装。",
+  catalogRankDetailLoading: "正在读取 mcp.so 详情…",
+  catalogRankDetailFailed: "mcp.so 详情读取失败",
+  catalogRankNoConfig: "该条目在 mcp.so 详情页没有可用的安装配置，只能跳转查看。",
 };
 const EN: Dict = {
   title: "Connectors",
@@ -205,6 +283,80 @@ const EN: Dict = {
   themeToggle: "Toggle theme",
   openFolder: "Open folder",
   backToTop: "Back to top",
+  discover: "Discover connectors",
+  catalogTitle: "Discover connectors",
+  catalogSubtitle: "Find connectors on MCP Registry, mcp.so or the WorkBuddy marketplace, then install into the selected agents",
+  catalogOfficial: "Official reference",
+  catalogRegistry: "Online",
+  catalogSearchPlaceholder: "Search MCP Registry (name / description)…",
+  catalogSearch: "Search",
+  catalogRegistryHint: "Data comes from the official MCP Registry. Verify the source before installing — it runs inside the selected agent.",
+  catalogInstall: "Install",
+  catalogInstalled: "Installed",
+  catalogUninstall: "Uninstall",
+  catalogConfirmUninstall: "Confirm uninstall",
+  catalogTargets: "Install into",
+  catalogName: "Server name",
+  catalogNoTargets: "No writable agent configs.",
+  catalogNoResults: "No matching connectors.",
+  catalogLoading: "Connecting to MCP Registry…",
+  catalogFailed: "Failed to load",
+  catalogRequired: "required",
+  catalogInstallDone: "Installed",
+  catalogUninstallDone: "Uninstalled",
+  catalogPartial: "Some targets failed",
+  catalogBack: "Back to list",
+  catalogEmptyQuery: "Type a keyword to search, or browse the latest entries.",
+  catalogSourceRepo: "modelcontextprotocol/servers",
+  catalogDetails: "Details",
+  catalogRepository: "Repository",
+  catalogWebsite: "Website / docs",
+  catalogCommand: "Launch command",
+  catalogPackage: "Package",
+  catalogTransport: "Transport",
+  catalogRegistryName: "Registry name",
+  catalogEnvVars: "Environment",
+  catalogParams: "Install parameters",
+  catalogInstalledIn: "Installed in",
+  catalogBasicInfo: "Basics",
+  catalogNoRepo: "No repository is attached (probably a hosted service).",
+  catalogDetailHint: "<…> in the command marks a field you fill in when installing.",
+  catalogReadme: "README",
+  catalogReadmeLoading: "Loading repository README…",
+  catalogReadmeFailed: "Failed to load README",
+  catalogReadmeTruncated: "README is long; only the first 600 lines are shown. View the full file on GitHub.",
+  catalogViewOnGitHub: "View on GitHub",
+  catalogLoadMore: "Load more",
+  catalogLoaded: "Loaded",
+  catalogOfficialHint: "The official repository only maintains a small set of reference implementations. Switch to Online (the official MCP Registry) for the full, installable catalog.",
+  catalogMcpso: "mcp.so Top 100",
+  catalogMcpsoHint: "Read-only view of the mcp.so rankings Top 100. Click an entry to open its mcp.so page.",
+  catalogMcpsoLoading: "Loading mcp.so rankings…",
+  catalogMcpsoFailed: "Failed to load mcp.so rankings",
+  catalogMcpsoStale: "mcp.so is unreachable; showing the last successful snapshot.",
+  catalogMcpsoFetched: "Fetched",
+  catalogOpenOnMcpso: "Open on mcp.so",
+  catalogRankMonthly: "Monthly searches",
+  catalogRankStars: "Stars",
+  catalogRankScore: "Score",
+  catalogWorkbuddy: "WorkBuddy connectors",
+  catalogWorkbuddyHint: "Reads the local WorkBuddy official connector marketplace. MCP connectors install into WorkBuddy; CLI connectors are browse-only.",
+  catalogWorkbuddyLoading: "Loading WorkBuddy connectors…",
+  catalogWorkbuddyFailed: "Failed to load WorkBuddy connectors",
+  catalogInstallable: "Installable",
+  catalogCliOnly: "CLI (WorkBuddy only)",
+  catalogFilter: "Filter",
+  catalogRetry: "Retry",
+  catalogExamples: "Examples",
+  catalogGetCredential: "Get credentials / docs",
+  catalogFixedTarget: "Target is fixed to WorkBuddy",
+  catalogWbNotInstalled: "WorkBuddy connector marketplace was not found.",
+  catalogConnectorsUnit: "connectors",
+  catalogOfflineTitle: "Built-in reference implementations (offline)",
+  catalogOfflineHint: "All online sources are unavailable and WorkBuddy is not installed. These 7 official reference implementations can be installed without network access.",
+  catalogRankDetailLoading: "Loading mcp.so details…",
+  catalogRankDetailFailed: "Failed to load mcp.so details",
+  catalogRankNoConfig: "No install configuration was found on this mcp.so page; it is browse-only.",
 };
 
 function makeT(ctx: ClientContext): (key: string) => string {
@@ -291,6 +443,7 @@ const ICONS = {
   chevron: "M4 6l4 4 4-4",
   fold: "M4 8h8M4 12h8M4 4h8",
   bolt: "M9 1.5L3.5 9H8l-1 5.5L12.5 7H8z",
+  plug: "M5.5 2v3M10.5 2v3M3.5 5h9v2.5a4.5 4.5 0 0 1-9 0zM8 12v2.5",
 };
 
 // ---------- 主题：跟随 DSH 宿主，不做自己的开关 ----------
@@ -367,6 +520,7 @@ type ModalState =
   | { type: "deleteBackup"; backup: BackupEntry }
   | { type: "rootPath"; source: SourceView }
   | { type: "customSource" }
+  | { type: "catalog" }
   | { type: "json"; name: string; spec: McpServerSpec }
   | null;
 
@@ -726,6 +880,7 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
           h("option", { value: "backups" }, `${t("navBackups")} (${totals.backups})`)),
         h("button", { className: "dmm-icon-btn", title: t("addSource"), onClick: () => setModal({ type: "customSource" }) }, icon(ICONS.plus)),
         h("div", { className: "grow" }),
+        h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: () => setModal({ type: "catalog" }) }, icon(ICONS.plug, 13), t("discover")),
         h("button", { className: "dmm-icon-btn", title: t("refresh"), onClick: () => refresh() }, icon(ICONS.refresh)),
         h("button", { className: "dmm-btn dmm-btn-primary", onClick: () => setModal({ type: "edit", source: nav !== "all" && nav !== "backups" ? nav : (sources[0]?.key ?? "") }) },
           icon(ICONS.plus), t("addServer"))),
@@ -767,7 +922,7 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
       style: { right: topPos.right, bottom: topPos.bottom },
     }, h("span", { style: { display: "inline-flex", transform: "rotate(180deg)" } }, icon(ICONS.chevron, 16))),
     // ---------- 弹窗 ----------
-    modal ? renderModal(modal, { t, sources, busy, setModal, mutate, toast }) : null);
+    modal ? renderModal(modal, { t, sources, busy, setModal, mutate, toast, refresh }) : null);
 }
 
 // ---------- 弹窗渲染 ----------
@@ -780,6 +935,7 @@ function renderModal(
     setModal: (m: ModalState) => void;
     mutate: (path: string, body: Record<string, unknown>, done: string) => Promise<void>;
     toast: (text: string, err?: boolean) => void;
+    refresh: () => Promise<void>;
   },
 ) {
   const { t, setModal, mutate } = ctx;
@@ -838,6 +994,9 @@ function renderModal(
 
     case "customSource":
       return h(CustomSourceModal, { t, close, mutate });
+
+    case "catalog":
+      return h(CatalogModal, { t, sources: ctx.sources, refresh: ctx.refresh, toast: ctx.toast, close });
 
     case "edit":
       return h(EditServerModal, { modal, t, sources: ctx.sources, close, mutate });
@@ -1021,6 +1180,764 @@ function CustomSourceModal(props: {
       h("div", { className: "dmm-modal-foot" },
         h("button", { className: "dmm-btn dmm-btn-secondary", onClick: close }, t("cancel")),
         h("button", { className: "dmm-btn dmm-btn-primary", onClick: () => mutate("/custom-source-add", { path, label }, t("toastSaved")) }, t("save"))));
+}
+
+// ---------- 连接器目录（modelcontextprotocol/servers + MCP Registry） ----------
+
+function CatalogModal(props: {
+  t: (k: string) => string;
+  sources: SourceView[];
+  refresh: () => Promise<void>;
+  toast: (text: string, err?: boolean) => void;
+  close: () => void;
+}) {
+  const { t, sources, refresh, toast, close } = props;
+  const isZh = t("title") === ZH.title;
+  type Tab = "registry" | "mcpso" | "workbuddy";
+  interface RankingsPayload { items: RankingEntry[]; fetchedAt: string; stale: boolean; source: string; error?: string }
+  interface WorkBuddyStatus { available: boolean; count: number; installable: number }
+  interface WorkBuddyCatalog extends WorkBuddyStatus { items: CatalogEntry[]; fetchedAt: string }
+
+  const [tab, setTab] = useState<Tab>("registry");
+  const [query, setQuery] = useState("");
+  const [results, setResults] = useState<CatalogEntry[] | null>(null);
+  const [nextCursor, setNextCursor] = useState<string | undefined>(undefined);
+  const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [installEntry, setInstallEntry] = useState<CatalogEntry | null>(null);
+  const [detailEntry, setDetailEntry] = useState<CatalogEntry | null>(null);
+  const [confirm, setConfirm] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+  const [searched, setSearched] = useState(false);
+  const [rankings, setRankings] = useState<RankingsPayload | null>(null);
+  const [rankLoading, setRankLoading] = useState(false);
+  const [rankError, setRankError] = useState<string | null>(null);
+  const [rankQuery, setRankQuery] = useState("");
+  const [wbStatus, setWbStatus] = useState<WorkBuddyStatus | null>(null);
+  const [workbuddy, setWorkbuddy] = useState<WorkBuddyCatalog | null>(null);
+  const [wbLoading, setWbLoading] = useState(false);
+  const [wbError, setWbError] = useState<string | null>(null);
+  const [wbQuery, setWbQuery] = useState("");
+  const [rankDetailLoading, setRankDetailLoading] = useState<string | null>(null);
+  interface RankingDetailPayload {
+    id: string; url: string; title?: string; description?: string; repository?: string;
+    installable: boolean; command?: string; args?: string[]; env?: Record<string, string>;
+    serverUrl?: string; headers?: Record<string, string>; fields?: CatalogField[];
+    extra?: Record<string, unknown>; warning?: string; error?: string; stale?: boolean;
+  }
+
+  const runSearch = useCallback(async (keyword: string, cursor?: string) => {
+    if (cursor) setLoadingMore(true);
+    else setLoading(true);
+    setError(null);
+    try {
+      const payload = await callApi<{ items?: CatalogEntry[]; nextCursor?: string } | CatalogEntry[]>(
+        `/catalog/search?q=${encodeURIComponent(keyword)}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`,
+      );
+      // 兼容旧版 host（直接返回数组）：升级后必须整应用重启，旧 host 没有分页字段
+      const items = Array.isArray(payload) ? payload : payload.items;
+      if (!Array.isArray(items)) throw new Error("catalog search returned an unexpected shape — restart DSH to reload the host routes");
+      setResults((current) => cursor && current ? [...current, ...items] : items);
+      setNextCursor(Array.isArray(payload) ? undefined : payload.nextCursor);
+    } catch (caught) {
+      setError(`${t("catalogFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+      setSearched(true);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (tab === "registry" && !searched && !loading) void runSearch("");
+  }, [tab, searched, loading, runSearch]);
+
+  // WorkBuddy 没装时来源目录不存在，面板里直接不出现这个 Tab
+  useEffect(() => {
+    let alive = true;
+    callApi<WorkBuddyStatus>("/catalog/workbuddy/status")
+      .then((status) => { if (alive) setWbStatus(status); })
+      .catch(() => { if (alive) setWbStatus({ available: false, count: 0, installable: 0 }); });
+    return () => { alive = false; };
+  }, []);
+
+  const loadRankings = useCallback(async () => {
+    setRankLoading(true);
+    setRankError(null);
+    try {
+      setRankings(await callApi<RankingsPayload>("/catalog/rankings"));
+    } catch (caught) {
+      setRankError(`${t("catalogMcpsoFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+    } finally {
+      setRankLoading(false);
+    }
+  }, [t]);
+
+  const loadWorkbuddy = useCallback(async () => {
+    setWbLoading(true);
+    setWbError(null);
+    try {
+      setWorkbuddy(await callApi<WorkBuddyCatalog>("/catalog/workbuddy"));
+    } catch (caught) {
+      setWbError(`${t("catalogWorkbuddyFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+    } finally {
+      setWbLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (tab === "mcpso" && !rankings && !rankLoading && !rankError) void loadRankings();
+  }, [tab, rankings, rankLoading, rankError, loadRankings]);
+
+  useEffect(() => {
+    if (tab === "workbuddy" && wbStatus?.available && !workbuddy && !wbLoading && !wbError) void loadWorkbuddy();
+  }, [tab, wbStatus, workbuddy, wbLoading, wbError, loadWorkbuddy]);
+
+  const openRankingDetail = useCallback(async (item: RankingEntry, mode: "detail" | "install") => {
+    setRankDetailLoading(item.id);
+    try {
+      const detail = await callApi<RankingDetailPayload>(`/catalog/ranking-detail?slug=${encodeURIComponent(item.id)}`);
+      const entry: CatalogEntry = {
+        id: detail.id || item.id,
+        title: detail.title ?? item.title,
+        description: detail.description ?? item.description ?? "",
+        descriptionZh: detail.description ?? item.description,
+        source: "mcpso",
+        transport: detail.serverUrl ? "http" : "stdio",
+        command: detail.command,
+        args: detail.args,
+        env: detail.env,
+        url: detail.serverUrl,
+        headers: detail.headers,
+        fields: detail.fields ?? [],
+        extra: detail.extra,
+        repository: detail.repository,
+        websiteUrl: item.url,
+        installable: detail.installable,
+        warning: detail.installable ? detail.warning : t("catalogRankNoConfig"),
+        tags: ["mcp.so"],
+      };
+      if (mode === "install" && entry.installable !== false) setInstallEntry(entry);
+      else setDetailEntry(entry);
+    } catch (caught) {
+      toast(`${t("catalogRankDetailFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+    } finally {
+      setRankDetailLoading(null);
+    }
+  }, [t, toast]);
+
+  const installationsOf = (entry: CatalogEntry) =>
+    sources.flatMap((source) =>
+      source.servers
+        .filter((server) => matchesCatalogEntry(entry, server.name, server.spec))
+        .map((server) => ({ source, server })),
+    );
+
+  const toggleOne = async (source: SourceView, server: ServerView) => {
+    const key = `toggle:${source.key}/${server.name}`;
+    setBusy(key);
+    try {
+      await callApi(server.enabled ? "/disable" : "/enable", {
+        method: "POST", headers: MUTATION_HEADERS,
+        body: JSON.stringify({ source: source.key, name: server.name }),
+      });
+      await refresh();
+    } catch (caught) {
+      toast(`${t("toastFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const uninstallOne = async (source: SourceView, server: ServerView) => {
+    const key = `delete:${source.key}/${server.name}`;
+    setBusy(key);
+    try {
+      await callApi("/delete", {
+        method: "POST", headers: MUTATION_HEADERS,
+        body: JSON.stringify({ source: source.key, name: server.name }),
+      });
+      toast(t("catalogUninstallDone"));
+      setConfirm(null);
+      await refresh();
+    } catch (caught) {
+      toast(`${t("toastFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  if (installEntry) {
+    return h(CatalogInstallView, {
+      entry: installEntry, t, sources, toast, refresh, isZh,
+      onBack: () => setInstallEntry(null), close,
+    });
+  }
+
+  if (detailEntry) {
+    return h(CatalogDetailView, {
+      entry: detailEntry, t, isZh, close,
+      installed: installationsOf(detailEntry),
+      onBack: () => setDetailEntry(null),
+      onInstall: () => { setDetailEntry(null); setInstallEntry(detailEntry); },
+    });
+  }
+
+  const card = (entry: CatalogEntry) => {
+    const installed = installationsOf(entry);
+    return h("div", { className: "dmm-catalog-card", key: entry.id },
+      h("div", { className: "dmm-catalog-main" },
+        h("div", { className: "dmm-catalog-title" },
+          isZh ? entry.title : entry.titleEn ?? entry.title,
+          h("span", { className: "dmm-tag gray" }, entry.transport),
+          entry.source === "official"
+            ? h("span", { className: "dmm-tag blue" }, t("catalogOfficial"))
+            : entry.source === "registry"
+              ? h("span", { className: "dmm-tag cyan" }, t("catalogRegistry"))
+              : entry.source === "mcpso"
+                ? h("span", { className: "dmm-tag accent" }, t("catalogMcpso"))
+                : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
+          entry.installable === false ? h("span", { className: "dmm-tag yellow" }, t("catalogCliOnly")) : null,
+          installed.length ? h("span", { className: "dmm-tag green" }, `${t("catalogInstalled")} ${installed.length}`) : null),
+        h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
+        entry.packageId || entry.repository
+          ? h("div", { className: "dmm-catalog-meta" },
+              entry.packageId ? h("code", null, entry.packageId) : null,
+              entry.repository
+                ? h("a", {
+                    className: "dmm-link", href: entry.repository, target: "_blank", rel: "noreferrer noopener",
+                    onClick: (e: React.MouseEvent) => e.stopPropagation(),
+                  }, t("catalogRepository"))
+                : null)
+          : null,
+        entry.warning && entry.source !== "official" ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
+        installed.length
+          ? h("div", { className: "dmm-catalog-installs" }, installed.map(({ source, server }) => {
+            const rowKey = `${source.key}/${server.name}`;
+            return h("div", { className: "dmm-catalog-install", key: rowKey },
+              h("span", { className: "dmm-tag " + (server.enabled ? "green" : "gray") }, source.label),
+              h("span", { className: "grow dmm-catalog-install-name" }, `${server.name} · ${server.enabled ? t("enabledTag") : t("disabledTag")}`),
+              h("button", {
+                className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                disabled: busy === `toggle:${rowKey}`,
+                onClick: () => void toggleOne(source, server),
+              }, server.enabled ? t("switchDisable") : t("switchEnable")),
+              confirm === rowKey
+                ? h("button", {
+                    className: "dmm-btn dmm-btn-danger dmm-btn-sm",
+                    disabled: busy === `delete:${rowKey}`,
+                    onClick: () => void uninstallOne(source, server),
+                  }, t("catalogConfirmUninstall"))
+                : h("button", {
+                    className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                    onClick: () => setConfirm(rowKey),
+                  }, t("catalogUninstall")));
+          }))
+          : null),
+      h("div", { className: "dmm-catalog-actions" },
+        h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: () => setDetailEntry(entry) }, t("catalogDetails")),
+        entry.installable === false
+          ? null
+          : h("button", { className: "dmm-btn dmm-btn-primary dmm-btn-sm", onClick: () => setInstallEntry(entry) }, t("catalogInstall"))));
+  };
+
+  const rankCard = (item: RankingEntry) =>
+    h("div", { className: "dmm-rank-card", key: item.id },
+      h("span", { className: "dmm-rank-no" }, String(item.rank)),
+      h("div", { className: "dmm-catalog-main" },
+        h("div", { className: "dmm-catalog-title" },
+          item.title,
+          item.author ? h("span", { className: "dmm-rank-author" }, item.author) : null),
+        item.description ? h("div", { className: "dmm-catalog-desc" }, item.description) : null,
+        h("div", { className: "dmm-rank-metrics" },
+          item.monthlySearches ? h("span", { className: "dmm-tag gray" }, `${t("catalogRankMonthly")} ${item.monthlySearches}`) : null,
+          item.stars ? h("span", { className: "dmm-tag yellow" }, `★ ${item.stars}`) : null,
+          item.score ? h("span", { className: "dmm-tag blue" }, `${t("catalogRankScore")} ${item.score}`) : null,
+          h("a", {
+            className: "dmm-link", href: item.url, target: "_blank", rel: "noreferrer noopener",
+            onClick: (e: React.MouseEvent) => e.stopPropagation(),
+          }, t("catalogOpenOnMcpso")))),
+      h("div", { className: "dmm-catalog-actions" },
+        h("button", {
+          className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+          disabled: rankDetailLoading === item.id,
+          onClick: () => void openRankingDetail(item, "detail"),
+        }, rankDetailLoading === item.id ? t("catalogRankDetailLoading") : t("catalogDetails")),
+        h("button", {
+          className: "dmm-btn dmm-btn-primary dmm-btn-sm",
+          disabled: rankDetailLoading === item.id,
+          onClick: () => void openRankingDetail(item, "install"),
+        }, t("catalogInstall"))));
+
+  const registryList = results ?? [];
+  const rankFilter = rankQuery.trim().toLowerCase();
+  const rankList = (rankings?.items ?? []).filter((item) =>
+    !rankFilter || `${item.title} ${item.author ?? ""} ${item.description ?? ""}`.toLowerCase().includes(rankFilter));
+  const wbFilter = wbQuery.trim().toLowerCase();
+  const wbList = (workbuddy?.items ?? []).filter((item) =>
+    !wbFilter || `${item.title} ${item.titleEn ?? ""} ${item.description} ${item.descriptionZh ?? ""} ${(item.examples ?? []).join(" ")}`
+      .toLowerCase().includes(wbFilter));
+
+  const tabButton = (key: Tab, label: string) =>
+    h("button", { key, "aria-selected": tab === key, onClick: () => setTab(key) }, label);
+
+  const sourceLabel =
+    tab === "registry" ? "MCP Registry"
+      : tab === "mcpso" ? "mcp.so"
+        : "WorkBuddy";
+
+  // 断网兜底：在线来源都失败且本机没有 WorkBuddy 时，才露出内置的 7 个参考实现
+  const showOfflineFallback = !wbStatus?.available && (
+    (tab === "registry" && Boolean(error) && registryList.length === 0) ||
+    (tab === "mcpso" && Boolean(rankError) && !(rankings?.items?.length))
+  );
+
+  return h(ModalShell, { onClose: close, wide: true },
+    h("div", { className: "dmm-modal-head" },
+      h("div", { className: "dmm-modal-title" }, t("catalogTitle")),
+      h("div", { className: "dmm-segmented" },
+        tabButton("registry", t("catalogRegistry")),
+        tabButton("mcpso", t("catalogMcpso")),
+        wbStatus?.available ? tabButton("workbuddy", t("catalogWorkbuddy")) : null),
+      h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))),
+    h("div", { className: "dmm-modal-body" },
+      h("div", { className: "dmm-catalog-subtitle" }, t("catalogSubtitle")),
+
+      tab === "registry" ? [
+        h("div", { className: "dmm-catalog-search", key: "search" },
+          h("input", {
+            className: "dmm-input", value: query, placeholder: t("catalogSearchPlaceholder"),
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setQuery(e.target.value),
+            onKeyDown: (e: React.KeyboardEvent) => { if (e.key === "Enter") void runSearch(query); },
+          }),
+          h("button", { className: "dmm-btn dmm-btn-secondary", onClick: () => void runSearch(query) }, icon(ICONS.search, 13), t("catalogSearch"))),
+        h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogRegistryHint")),
+        !searched && !loading ? h("div", { className: "dmm-empty", key: "emptyq" }, t("catalogEmptyQuery")) : null,
+        loading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogLoading")) : null,
+        error ? h("div", { className: "dmm-warn", key: "error" }, error) : null,
+        !loading && !error && searched && registryList.length === 0
+          ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults"))
+          : null,
+        h("div", { className: "dmm-catalog-list", key: "list" }, registryList.map(card)),
+        registryList.length
+          ? h("div", { className: "dmm-catalog-more", key: "more" },
+              h("span", { className: "dmm-field-hint" }, `${t("catalogLoaded")} ${registryList.length}`),
+              nextCursor
+                ? h("button", {
+                    className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                    disabled: loadingMore,
+                    onClick: () => void runSearch(query, nextCursor),
+                  }, loadingMore ? t("catalogLoading") : t("catalogLoadMore"))
+                : null)
+          : null,
+      ] : null,
+
+      tab === "mcpso" ? [
+        h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogMcpsoHint")),
+        h("div", { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
+          h("input", {
+            className: "dmm-input", value: rankQuery, placeholder: `${t("catalogFilter")}…`,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setRankQuery(e.target.value),
+          })),
+        rankLoading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogMcpsoLoading")) : null,
+        rankError && !rankings
+          ? h("div", { key: "error" },
+              h("div", { className: "dmm-warn" }, rankError),
+              h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadRankings() }, t("catalogRetry")))
+          : null,
+        rankings?.stale
+          ? h("div", { className: "dmm-warn", key: "stale" },
+              `${t("catalogMcpsoStale")}${rankings.error ? `（${rankings.error}）` : ""} · ${t("catalogMcpsoFetched")} ${new Date(rankings.fetchedAt).toLocaleString()}`)
+          : null,
+        rankings
+          ? h("div", { className: "dmm-field-hint", key: "fetched" },
+              `${t("catalogMcpsoFetched")} ${new Date(rankings.fetchedAt).toLocaleString()}`)
+          : null,
+        h("div", { className: "dmm-catalog-list", key: "list" }, rankList.map(rankCard)),
+        rankings && !rankList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
+      ] : null,
+
+      tab === "workbuddy" ? [
+        h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogWorkbuddyHint")),
+        workbuddy
+          ? h("div", { className: "dmm-field-hint", key: "summary" },
+              `${workbuddy.count} ${t("catalogConnectorsUnit")} · ${t("catalogInstallable")} ${workbuddy.installable} · ${new Date(workbuddy.fetchedAt).toLocaleString()}`)
+          : null,
+        h("div", { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
+          h("input", {
+            className: "dmm-input", value: wbQuery, placeholder: `${t("catalogFilter")}…`,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setWbQuery(e.target.value),
+          })),
+        wbLoading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogWorkbuddyLoading")) : null,
+        wbError && !workbuddy
+          ? h("div", { key: "error" },
+              h("div", { className: "dmm-warn" }, wbError),
+              h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadWorkbuddy() }, t("catalogRetry")))
+          : null,
+        h("div", { className: "dmm-catalog-list", key: "list" }, wbList.map(card)),
+        workbuddy && !wbList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
+        !wbStatus?.available ? h("div", { className: "dmm-empty", key: "noWB" }, t("catalogWbNotInstalled")) : null,
+      ] : null,
+
+      showOfflineFallback
+        ? h("div", { className: "dmm-detail-section", key: "offline" },
+            h("div", { className: "dmm-detail-section-title" }, t("catalogOfflineTitle")),
+            h("div", { className: "dmm-field-hint", style: { marginBottom: 6 } }, t("catalogOfflineHint")),
+            h("div", { className: "dmm-catalog-list" }, OFFICIAL_CATALOG.map(card)))
+        : null),
+    h("div", { className: "dmm-modal-foot" },
+      h("span", { className: "dmm-field-hint", style: { marginRight: "auto" } }, sourceLabel),
+      h("button", { className: "dmm-btn dmm-btn-secondary", onClick: close }, t("cancel"))));
+}
+
+/** 极简 Markdown 渲染：标题 / 列表 / 代码块 / 行内代码 / 粗体 / 链接。不注入 HTML。 */
+function renderInlineMarkdown(text: string, prefix: string): React.ReactNode[] {
+  const out: React.ReactNode[] = [];
+  const re = /\[([^\]]+)\]\(([^)\s]+)\)|`([^`]+)`|\*\*([^*]+)\*\*/g;
+  let last = 0;
+  let match: RegExpExecArray | null;
+  let index = 0;
+  while ((match = re.exec(text))) {
+    if (match.index > last) out.push(text.slice(last, match.index));
+    if (match[1] !== undefined && match[2] !== undefined) {
+      const href = match[2];
+      out.push(/^https?:\/\//i.test(href)
+        ? h("a", { key: `${prefix}-a${index++}`, className: "dmm-link", href, target: "_blank", rel: "noreferrer noopener" }, match[1])
+        : match[1]);
+    } else if (match[3] !== undefined) {
+      out.push(h("code", { key: `${prefix}-c${index++}`, className: "dmm-md-code" }, match[3]));
+    } else if (match[4] !== undefined) {
+      out.push(h("strong", { key: `${prefix}-b${index++}` }, match[4]));
+    }
+    last = re.lastIndex;
+  }
+  if (last < text.length) out.push(text.slice(last));
+  return out;
+}
+
+function renderMarkdown(text: string): React.ReactNode {
+  const all = text.replace(/\r\n/g, "\n").split("\n");
+  const lines = all.slice(0, 600);
+  const nodes: React.ReactNode[] = [];
+  let code: string[] | null = null;
+  let list: React.ReactNode[] = [];
+  let key = 0;
+  const flushList = () => {
+    if (!list.length) return;
+    nodes.push(h("ul", { className: "dmm-md-list", key: `ul${key++}` }, list));
+    list = [];
+  };
+  for (const line of lines) {
+    const fence = line.match(/^\s*```/);
+    if (fence) {
+      if (code) {
+        nodes.push(h("pre", { className: "dmm-code-block", key: `code${key++}` }, code.join("\n")));
+        code = null;
+      } else {
+        flushList();
+        code = [];
+      }
+      continue;
+    }
+    if (code) {
+      code.push(line);
+      continue;
+    }
+    if (!line.trim()) {
+      flushList();
+      continue;
+    }
+    const heading = line.match(/^(#{1,4})\s+(.*)$/);
+    if (heading) {
+      flushList();
+      const level = Math.min(heading[1].length, 3);
+      nodes.push(h("div", { className: `dmm-md-h${level}`, key: `h${key++}` }, renderInlineMarkdown(heading[2], `h${key}`)));
+      continue;
+    }
+    const item = line.match(/^\s*(?:[-*+]|\d+\.)\s+(.*)$/);
+    if (item) {
+      list.push(h("li", { key: `li${key++}` }, renderInlineMarkdown(item[1], `li${key}`)));
+      continue;
+    }
+    flushList();
+    nodes.push(h("div", { className: "dmm-md-p", key: `p${key++}` }, renderInlineMarkdown(line, `p${key}`)));
+  }
+  flushList();
+  if (code) nodes.push(h("pre", { className: "dmm-code-block", key: `code${key++}` }, code.join("\n")));
+  return h("div", { className: "dmm-readme" }, nodes);
+}
+
+function CatalogDetailView(props: {
+  entry: CatalogEntry;
+  t: (k: string) => string;
+  isZh: boolean;
+  installed: Array<{ source: SourceView; server: ServerView }>;
+  onBack: () => void;
+  onInstall: () => void;
+  close: () => void;
+}) {
+  const { entry, t, isZh, installed, onBack, onInstall, close } = props;
+  const [readme, setReadme] = useState<{ text: string; url: string; truncated: boolean } | null>(null);
+  const [readmeError, setReadmeError] = useState<string | null>(null);
+  const [readmeLoading, setReadmeLoading] = useState(Boolean(entry.repository));
+
+  useEffect(() => {
+    let alive = true;
+    if (!entry.repository) {
+      setReadmeLoading(false);
+      return;
+    }
+    setReadmeLoading(true);
+    callApi<{ text: string; url: string; truncated: boolean }>(`/catalog/readme?repo=${encodeURIComponent(entry.repository)}`)
+      .then((data) => {
+        if (!alive) return;
+        setReadme(data);
+        setReadmeError(null);
+      })
+      .catch((caught) => {
+        if (alive) setReadmeError(caught instanceof Error ? caught.message : String(caught));
+      })
+      .finally(() => {
+        if (alive) setReadmeLoading(false);
+      });
+    return () => { alive = false; };
+  }, [entry.repository]);
+
+  const fieldLabel = (field: CatalogField) => (isZh ? field.label : field.labelEn ?? field.label);
+  const examples = (isZh ? entry.examples ?? entry.examplesEn : entry.examplesEn ?? entry.examples) ?? [];
+  const labelFor = (key: string) => {
+    const field = entry.fields.find((item) => item.key === key);
+    return field ? fieldLabel(field) : key;
+  };
+  const displayTemplate = (text: string) => text.replace(/\{\{([\w-]+)\}\}/g, (_, key: string) => `<${labelFor(key)}>`);
+  const command = [entry.command, ...(entry.args ?? []).map(displayTemplate)].filter(Boolean).join(" ");
+  const infoRow = (label: string, value?: string) =>
+    value
+      ? h("div", { className: "dmm-detail-row", key: label },
+          h("span", { className: "dmm-detail-label" }, label),
+          h("span", { className: "dmm-detail-value" }, value))
+      : null;
+  const sectionTitle = (text: string) => h("div", { className: "dmm-detail-section-title" }, text);
+
+  return h(ModalShell, { onClose: close, wide: true },
+    h("div", { className: "dmm-modal-head" },
+      h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: onBack }, t("catalogBack")),
+      h("div", { className: "dmm-modal-title" }, isZh ? entry.title : entry.titleEn ?? entry.title),
+      h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))),
+    h("div", { className: "dmm-modal-body" },
+      h("div", { className: "dmm-catalog-title" },
+        h("span", { className: "dmm-tag gray" }, entry.transport),
+        entry.source === "official"
+          ? h("span", { className: "dmm-tag blue" }, t("catalogOfficial"))
+          : entry.source === "registry"
+            ? h("span", { className: "dmm-tag cyan" }, t("catalogRegistry"))
+            : entry.source === "mcpso"
+              ? h("span", { className: "dmm-tag accent" }, t("catalogMcpso"))
+              : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
+        entry.installable === false ? h("span", { className: "dmm-tag yellow" }, t("catalogCliOnly")) : null,
+        ...(entry.tags ?? []).map((tag) => h("span", { className: "dmm-tag gray", key: tag }, tag))),
+      h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
+      entry.warning ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
+      examples.length
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogExamples")),
+            h("ul", { className: "dmm-md-list" },
+              examples.map((example, index) => h("li", { key: index }, example))))
+        : null,
+
+      entry.source !== "workbuddy"
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogReadme")),
+            readmeLoading
+              ? h("div", { className: "dmm-field-hint" }, t("catalogReadmeLoading"))
+              : readme
+                ? renderMarkdown(readme.text)
+                : h("div", { className: "dmm-field-hint" },
+                    entry.repository ? `${t("catalogReadmeFailed")}: ${readmeError ?? ""}` : t("catalogNoRepo")),
+            readme?.truncated ? h("div", { className: "dmm-field-hint" }, t("catalogReadmeTruncated")) : null,
+            readme && entry.repository
+              ? h("a", { className: "dmm-link", href: entry.repository, target: "_blank", rel: "noreferrer noopener" }, t("catalogViewOnGitHub"))
+              : null)
+        : null,
+
+      entry.source !== "workbuddy"
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogRepository")),
+            h("div", { className: "dmm-detail-list" },
+              entry.repository
+                ? h("div", { className: "dmm-detail-row" },
+                    h("span", { className: "dmm-detail-label" }, "Git"),
+                    h("a", { className: "dmm-detail-value dmm-link", href: entry.repository, target: "_blank", rel: "noreferrer noopener" }, entry.repository))
+                : h("div", { className: "dmm-field-hint" }, t("catalogNoRepo")),
+              entry.websiteUrl
+                ? h("div", { className: "dmm-detail-row" },
+                    h("span", { className: "dmm-detail-label" }, t("catalogWebsite")),
+                    h("a", { className: "dmm-detail-value dmm-link", href: entry.websiteUrl, target: "_blank", rel: "noreferrer noopener" }, entry.websiteUrl))
+                : null,
+              entry.docUrl
+                ? h("div", { className: "dmm-detail-row" },
+                    h("span", { className: "dmm-detail-label" }, t("catalogGetCredential")),
+                    h("a", { className: "dmm-detail-value dmm-link", href: entry.docUrl, target: "_blank", rel: "noreferrer noopener" },
+                      isZh ? entry.docLabel ?? entry.docUrl : entry.docLabelEn ?? entry.docLabel ?? entry.docUrl))
+                : null))
+        : entry.docUrl
+          ? h("div", { className: "dmm-detail-section" },
+              sectionTitle(t("catalogGetCredential")),
+              h("a", { className: "dmm-link", href: entry.docUrl, target: "_blank", rel: "noreferrer noopener" },
+                isZh ? entry.docLabel ?? entry.docUrl : entry.docLabelEn ?? entry.docLabel ?? entry.docUrl))
+          : null,
+
+      h("div", { className: "dmm-detail-section" },
+        sectionTitle(t("catalogBasicInfo")),
+        h("div", { className: "dmm-detail-grid" },
+          infoRow(t("catalogPackage"), entry.packageId),
+          infoRow(t("catalogTransport"), entry.transport),
+          infoRow(t("catalogRegistryName"), entry.registryName))),
+
+      command
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogCommand")),
+            h("pre", { className: "dmm-code-block" }, command),
+            h("div", { className: "dmm-field-hint" }, t("catalogDetailHint")))
+        : null,
+
+      entry.fields.length
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogParams")),
+            h("div", { className: "dmm-detail-list" }, entry.fields.map((field) => h("div", { className: "dmm-detail-row", key: field.key },
+              h("span", { className: "dmm-detail-label" }, fieldLabel(field), field.required ? h("span", { className: "dmm-req" }, " *") : null),
+              h("span", { className: "dmm-detail-value" }, field.description ?? (field.kind === "lines" ? "每行一个 / one per line" : ""))))))
+        : null,
+
+      entry.env && Object.keys(entry.env).length
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogEnvVars")),
+            h("div", { className: "dmm-detail-list" }, Object.keys(entry.env).map((key) => {
+              const field = entry.fields.find((item) => item.key === key);
+              return h("div", { className: "dmm-detail-row", key },
+                h("span", { className: "dmm-detail-label" }, h("code", null, key)),
+                h("span", { className: "dmm-detail-value" }, field?.description ?? (field?.required ? "required" : "")));
+            })))
+        : null,
+
+      installed.length
+        ? h("div", { className: "dmm-detail-section" },
+            sectionTitle(t("catalogInstalledIn")),
+            h("div", { className: "dmm-detail-list" }, installed.map(({ source, server }) => h("div", { className: "dmm-detail-row", key: `${source.key}/${server.name}` },
+              h("span", { className: "dmm-detail-label" }, source.label),
+              h("span", { className: "dmm-detail-value" }, `${server.name} · ${server.enabled ? t("enabledTag") : t("disabledTag")}`)))))
+        : null),
+    h("div", { className: "dmm-modal-foot" },
+      h("button", { className: "dmm-btn dmm-btn-secondary", style: { marginRight: "auto" }, onClick: onBack }, t("cancel")),
+      entry.installable === false
+        ? null
+        : h("button", { className: "dmm-btn dmm-btn-primary", onClick: onInstall }, icon(ICONS.plug, 13), t("catalogInstall"))));
+}
+
+function CatalogInstallView(props: {
+  entry: CatalogEntry;
+  t: (k: string) => string;
+  sources: SourceView[];
+  toast: (text: string, err?: boolean) => void;
+  refresh: () => Promise<void>;
+  isZh: boolean;
+  onBack: () => void;
+  close: () => void;
+}) {
+  const { entry, t, sources, toast, refresh, isZh, onBack, close } = props;
+  const writable = sources.filter((source) => source.writable && !source.error);
+  const fixedTarget = entry.installTarget;
+  const fixedSource = fixedTarget ? sources.find((source) => source.key === fixedTarget) : null;
+  const [targets, setTargets] = useState<string[]>(() =>
+    fixedTarget ? [fixedTarget] : writable.slice(0, 1).map((source) => source.key));
+  const [name, setName] = useState(entry.id);
+  const [values, setValues] = useState<Record<string, string>>(() =>
+    Object.fromEntries(entry.fields.map((field) => [field.key, field.default ?? ""])));
+  const [busy, setBusy] = useState(false);
+
+  const missing = entry.fields.filter((field) => field.required && !(values[field.key] ?? "").trim());
+  const canInstall = targets.length > 0 && name.trim().length > 0 && missing.length === 0 && !busy;
+
+  const submit = async () => {
+    if (!canInstall) return;
+    setBusy(true);
+    try {
+      const spec = expandCatalogSpec(entry, values);
+      const result = await callApi<{ results: Array<{ source: string; ok?: boolean; error?: string }> }>("/catalog/install", {
+        method: "POST", headers: MUTATION_HEADERS,
+        body: JSON.stringify({ name: name.trim(), targets, spec }),
+      });
+      const failed = (result.results ?? []).filter((item) => item.ok === false);
+      if (failed.length) {
+        toast(`${t("catalogPartial")}: ${failed.map((item) => `${item.source}: ${item.error ?? ""}`).join("; ")}`, true);
+      } else {
+        toast(t("catalogInstallDone"));
+        onBack();
+      }
+      await refresh();
+    } catch (caught) {
+      toast(`${t("toastFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const fieldLabel = (field: CatalogField) => (isZh ? field.label : field.labelEn ?? field.label);
+
+  return h(ModalShell, { onClose: close, wide: true },
+    h("div", { className: "dmm-modal-head" },
+      h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: onBack }, t("catalogBack")),
+      h("div", { className: "dmm-modal-title" }, `${t("catalogInstall")} · ${isZh ? entry.title : entry.titleEn ?? entry.title}`),
+      h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))),
+    h("div", { className: "dmm-modal-body" },
+      h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
+      entry.warning ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
+      h("div", { className: "dmm-field" },
+        h("label", { className: "dmm-field-label" }, t("catalogTargets")),
+        fixedTarget
+          ? h("div", { className: "dmm-field-hint" }, `${t("catalogFixedTarget")} · ${fixedSource?.label ?? fixedTarget}`)
+          : writable.length
+            ? h("div", { className: "dmm-check-list" }, writable.map((source) => {
+              const checked = targets.includes(source.key);
+              return h("label", { className: "dmm-check", key: source.key },
+                h("input", {
+                  type: "checkbox", checked,
+                  onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                    setTargets((current) => e.target.checked ? [...current, source.key] : current.filter((key) => key !== source.key)),
+                }),
+                h("span", null, source.label));
+            }))
+            : h("div", { className: "dmm-field-hint" }, t("catalogNoTargets"))),
+      h("div", { className: "dmm-field" },
+        h("label", { className: "dmm-field-label" }, t("catalogName")),
+        h("input", { className: "dmm-input", value: name, onChange: (e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value) })),
+      entry.fields.map((field) => h("div", { className: "dmm-field", key: field.key },
+        h("label", { className: "dmm-field-label" }, fieldLabel(field), field.required ? h("span", { className: "dmm-req" }, " *") : null),
+        field.kind === "lines"
+          ? h("textarea", {
+              className: "dmm-textarea", style: { minHeight: 64 }, value: values[field.key] ?? "",
+              placeholder: field.placeholder ?? "",
+              onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                setValues((current) => ({ ...current, [field.key]: e.target.value })),
+            })
+          : h("input", {
+              className: "dmm-input", type: field.secret ? "password" : "text", value: values[field.key] ?? "",
+              placeholder: field.placeholder ?? "",
+              onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+                setValues((current) => ({ ...current, [field.key]: e.target.value })),
+            }),
+        field.description ? h("div", { className: "dmm-field-hint" }, field.description) : null)),
+      entry.docUrl
+        ? h("div", { className: "dmm-field" },
+            h("a", { className: "dmm-link", href: entry.docUrl, target: "_blank", rel: "noreferrer noopener" },
+              isZh ? entry.docLabel ?? entry.docUrl : entry.docLabelEn ?? entry.docLabel ?? entry.docUrl))
+        : null),
+    h("div", { className: "dmm-modal-foot" },
+      h("button", { className: "dmm-btn dmm-btn-secondary", onClick: onBack }, t("cancel")),
+      entry.installable === false
+        ? null
+        : h("button", { className: "dmm-btn dmm-btn-primary", disabled: !canInstall, onClick: () => void submit() }, t("catalogInstall"))));
 }
 
 // ---------- 入口 ----------

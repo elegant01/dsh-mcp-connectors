@@ -25,10 +25,11 @@ This plugin auto-discovers those files, shows them in one panel, and lets you to
 ## Features
 
 - **Auto-discovery** — scans `~`, `%APPDATA%` and `%LOCALAPPDATA%` (macOS/Linux equivalents included), identifies configs by file name **and** content (`mcpServers` / `mcp` keys, `[mcp_servers]` sections). First scan ≈250 ms on a typical dev machine, then cached.
-- **Multi-format support** — JSON (`mcpServers`), OpenCode-style (`mcp`), Codex TOML (`[mcp_servers.*]`, rewritten per section so comments and unrelated settings survive byte-for-byte), and JSONC (comments / trailing commas).
+- **Multi-format support** — JSON (`mcpServers`), OpenCode-style (`mcp`), Codex TOML (`[mcp_servers.*]`), DSH's `cordis.patch.yml` (`@deepseek-ai/dsh-mcp-client` entries), and JSONC (comments / trailing commas). TOML and YAML are rewritten entry-by-entry so comments and unrelated settings survive byte-for-byte.
 - **Safe writes** — every write snapshots the original file into `~/.dsh/mcp-connectors/backups/` (last 100 kept). Restore any version with one click; the restore itself is backed up too.
 - **Enable / disable** — MCP has no cross-tool `disabled` flag, so disabling removes the entry from the config and keeps its definition in the manager state; enabling writes it back.
 - **Product grouping** — tools that split their config across files (e.g. WorkBuddy user-level + connectors) render as one card, each server still bound to its own file.
+- **Connector catalog** — three sources: the official [MCP Registry](https://registry.modelcontextprotocol.io/) (live search + paging), the [mcp.so Top 100](https://mcp.so/zh/rankings/servers) (details and install, with an offline cache), and the local **WorkBuddy official connector marketplace** (MCP connectors install back into WorkBuddy; CLI connectors are browse-only). Pick target agents, fill in parameters, install in one click; installed entries can be toggled or uninstalled in place. Every entry has a detail view (repository / website, README, launch command, environment, parameters). If all online sources are unavailable and WorkBuddy is not installed, the 7 built-in reference implementations appear as an offline fallback.
 - **Drag to reorder** — display-only ordering stored in plugin state; config files are never touched.
 - **Panel that fits the settings page** — vertical layout, sticky section headers, collapsible groups, status/agent filters, back-to-top, and light/dark that follows the host theme.
 
@@ -38,7 +39,8 @@ This plugin auto-discovers those files, shows them in one panel, and lets you to
 
 | Agent | Path | Format |
 | --- | --- | --- |
-| DSH | `~/.dsh/mcp.json` | JSON `mcpServers` |
+| DSH | `~/.dsh/profiles/<profile>/cordis.patch.yml` | YAML `@deepseek-ai/dsh-mcp-client` entries |
+| DSH (legacy) | `~/.dsh/mcp.json` | JSON `mcpServers` |
 | Claude Code | `~/.claude.json` | JSON `mcpServers` |
 | Codex | `~/.codex/config.toml` | TOML `[mcp_servers.*]` |
 | Cursor | `~/.cursor/mcp.json` | JSON `mcpServers` |
@@ -76,7 +78,9 @@ Restart DSH, then open **Settings → Connectors**. Host routes are registered a
 
 - Every mutating request needs a custom header, `application/json`, and a same-origin `Origin`; the host's `connection.fetch` gate still applies.
 - Writes are serialized, and a backup always precedes a write.
-- Deleting a server removes only that entry; other keys in the file are preserved (JSON is re-serialized, Codex TOML is rewritten per section).
+- Deleting a server removes only that entry; other keys in the file are preserved (JSON is re-serialized, Codex TOML is rewritten per section, DSH YAML replaces only the target entry's `config:` block).
+- Online catalog search only talks to `registry.modelcontextprotocol.io` (results cached for 10 minutes). mcp.so access is limited to its allowed rankings and detail pages (cached for 30 minutes, robots.txt respected, `/search` never touched). WorkBuddy connectors are read from the local marketplace cache. Nothing is installed or run automatically — you confirm the target agents and parameters in the panel.
+- WorkBuddy connector installs keep `${VAR}` credential placeholders; real secrets stay in WorkBuddy's own key store and are never written to config by the plugin.
 
 ## Development
 
