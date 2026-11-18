@@ -4,6 +4,12 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-11-18
+
+### 变更
+
+- Also publishes to GitHub Packages (`@elegant01/dsh-mcp-connectors`) so the repo sidebar shows the package.
+
 ## [0.1.3] - 2026-11-18
 
 ### 变更

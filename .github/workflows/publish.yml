@@ -1,15 +1,18 @@
 name: publish
 
-# 推送 v* 标签即自动发版到 npm。
-# 认证走 npm Trusted Publishing（GitHub OIDC），不需要 NPM_TOKEN，也不受 2FA/OTP 限制：
-#   npm 包设置 → Trusted Publisher 已绑定 elegant01/dsh-mcp-connectors + 本文件（publish.yml）。
+# 推送 v* 标签即自动发版：
+#  - npm（公开分发，用户实际安装的就是这个）走 Trusted Publishing（GitHub OIDC），
+#    不需要 NPM_TOKEN，也不受 2FA/OTP 限制：
+#    npm 包设置 → Trusted Publisher 已绑定 elegant01/dsh-mcp-connectors + 本文件。
+#  - GitHub Packages（仓库右侧的 Packages 条目）用自带 GITHUB_TOKEN 发布；
+#    GitHub 要求包名带 owner 作用域，所以发布前临时把 name 改成 @elegant01/...。
 on:
   push:
     tags:
       - "v*"
 
 jobs:
-  publish:
+  npm:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -25,3 +28,22 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm publish --provenance --access public
+
+  github-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          registry-url: https://npm.pkg.github.com
+      - run: npm ci
+      - run: npm test
+      # GitHub Packages 只收 @<owner>/<name> 形式的包
+      - run: npm pkg set name=@elegant01/dsh-mcp-connectors
+      - run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
