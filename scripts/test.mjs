@@ -161,6 +161,20 @@ await writeFile(join(WB_ROOT, "connectors", "demo-cli", "cli.json"), JSON.string
   init: { win32: "npm i -g demo-cli" },
 }, null, 2));
 
+await mkdir(join(WB_ROOT, "icons"), { recursive: true });
+await writeFile(join(WB_ROOT, "icons", "demo.png"), Buffer.from("iVBORw0KGgo=", "base64"));
+
+// Qoder CN：MCP 配置在 settings.json 顶层 mcpServers（和插件、providers 共存）
+const QODER_CN_SETTINGS = join(HOME, ".qoder-cn", "settings.json");
+await mkdir(join(HOME, ".qoder-cn"), { recursive: true });
+await writeFile(QODER_CN_SETTINGS, JSON.stringify({
+  enabledPlugins: { "demo@qoder-marketplace": true },
+  providers: { demo: { baseUrl: "https://example.com/v1" } },
+  mcpServers: {
+    existing: { command: "node", args: ["x.js"], trust: true, timeout: 30000, includeTools: ["a"] },
+  },
+}, null, 2));
+
 await mkdir(join(ROOT, "empty-home"), { recursive: true });
 
 const core = await import("../lib/core.js");
@@ -171,6 +185,7 @@ const registry = await import("../lib/registry.js");
 const host = await import("../lib/index.js");
 const mcpso = await import("../lib/mcpso.js");
 const workbuddy = await import("../lib/workbuddy.js");
+const qoder = await import("../lib/qoder.js");
 const discover = await import("../lib/discover.js");
 const log = async () => {};
 
@@ -449,6 +464,9 @@ await test("host 路由：catalog install/uninstall 走写接口门禁", async (
   assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/ranking-detail"));
   assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/workbuddy"));
   assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/workbuddy/status"));
+  assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/workbuddy/icon"));
+  assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/qoder"));
+  assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/qoder/detail"));
 
   const makeRequest = (path, body, headers = {}) => new Request(`http://localhost${path}`, {
     method: "POST",
@@ -580,9 +598,14 @@ await test("映射本机市场：MCP 可安装、CLI 仅展示", async () => {
   assert.equal(catalog.count, 2);
   assert.equal(catalog.installable, 1);
 
+  // 顺序跟 connectors.json 一致（demo 在前，demo-cli 在后）
+  assert.equal(catalog.items[0].id, "connector:demo");
+  assert.equal(catalog.items[1].id, "cli:demo-cli");
+
   const demo = catalog.items.find((item) => item.id === "connector:demo");
   assert.ok(demo);
   assert.equal(demo.source, "workbuddy");
+  assert.ok(demo.iconUrl.includes("/catalog/workbuddy/icon?name=demo"));
   assert.equal(demo.transport, "http");
   assert.equal(demo.installTarget, "workbuddy-connectors");
   // WorkBuddy 保留 ${VAR} 占位符，凭据由 WorkBuddy 的 key store 注入，插件不落明文
@@ -597,6 +620,11 @@ await test("映射本机市场：MCP 可安装、CLI 仅展示", async () => {
   const cli = catalog.items.find((item) => item.id === "cli:demo-cli");
   assert.ok(cli);
   assert.equal(cli.installable, false);
+
+  const icon = await workbuddy.findWorkBuddyIcon("demo");
+  assert.ok(icon);
+  assert.equal(icon.contentType, "image/png");
+  assert.equal(await workbuddy.findWorkBuddyIcon("../demo"), null);
 });
 
 await test("展开 WorkBuddy 模板并安装到 workbuddy-connectors", async () => {
@@ -619,6 +647,105 @@ await test("展开 WorkBuddy 模板并安装到 workbuddy-connectors", async () 
   await core.uninstallCatalogServers({ name: demo.id, targets: ["workbuddy-connectors"] }, log);
   const after = JSON.parse(await readFile(join(HOME, ".workbuddy", "connectors", "default", "mcp.json"), "utf8"));
   assert.equal(after.mcpServers["connector:demo"], undefined);
+});
+
+console.log("\n[Qoder 连接器市场]");
+const QODER_ITEM = {
+  connector_id: "github",
+  connector_name: "GitHub",
+  connector_name_cn: "GitHub",
+  description: "Connect to GitHub through MCP.",
+  description_cn: "通过 MCP 连接 GitHub。",
+  icon_url: "https://qoder-cn-mind.oss-accelerate.aliyuncs.com/public/extensions/connector/admin/github/icon.svg",
+  category: "Coding",
+  tags: ["qoder-pro"],
+  install_count: 10227,
+};
+const qoderDetail = (server) => ({
+  ...QODER_ITEM,
+  config: { servers: [{ name: "GitHub", enabled: true, tools: [{ name: "search" }], ...server }] },
+});
+
+await test("目录映射：slug 作安装名，connector_id 留给详情接口", () => {
+  const item = qoder.mapQoderItem(QODER_ITEM, "https://qoder.cn");
+  assert.equal(item.source, "qoder");
+  assert.equal(item.id, "github");
+  assert.equal(item.remoteId, "github");
+  assert.equal(item.title, "GitHub");
+  assert.equal(item.descriptionZh, "通过 MCP 连接 GitHub。");
+  assert.equal(item.transport, "http");
+  assert.ok(item.websiteUrl.startsWith("https://qoder.cn/"));
+  assert.deepEqual(item.tags, ["qoder-pro", "Coding"]);
+
+  const uuid = qoder.mapQoderItem({ connector_id: "6ae073a0-a5c0-4e68-a8a5-bd70fb8c537e", connector_name: "Notion" }, "https://qoder.cn");
+  assert.equal(uuid.id, "notion");
+  assert.equal(uuid.remoteId, "6ae073a0-a5c0-4e68-a8a5-bd70fb8c537e");
+
+  // 中文名没有可用的 ASCII slug 时退回 connector_id
+  const zh = qoder.mapQoderItem({ connector_id: "qichacha", connector_name: "企查查", connector_name_cn: "企查查" }, "https://qoder.cn");
+  assert.equal(zh.id, "qichacha");
+});
+
+await test("详情映射：OAuth 直连可一键写回 Qoder", () => {
+  const entry = qoder.mapQoderDetail(qoderDetail({
+    url: "https://api.githubcopilot.com/mcp/",
+    qoder_url: "https://mcp.qoder.cn/api/v1/mcp/servers/mcp_srv_x",
+    protocol: "streamable_http",
+    auth_type: "oauth",
+  }), "https://qoder.cn");
+  assert.equal(entry.installable, true);
+  assert.equal(entry.url, "https://api.githubcopilot.com/mcp/");
+  assert.deepEqual(entry.extra, { type: "http" });
+  assert.ok(entry.warning.includes("OAuth"));
+  assert.equal(entry.id, "github");
+  assert.deepEqual(entry.fields, []);
+});
+
+await test("详情映射：网关托管 / API Key 只能浏览", () => {
+  const gateway = qoder.mapQoderDetail(qoderDetail({
+    url: "https://mcp.qoder.cn/api/v1/mcp/servers/mcp_srv_y",
+    qoder_url: "https://mcp.qoder.cn/api/v1/mcp/servers/mcp_srv_y",
+    protocol: "streamable_http",
+    auth_type: "oauth",
+  }), "https://qoder.cn");
+  assert.equal(gateway.installable, false);
+  assert.equal(gateway.url, undefined);
+  assert.ok(gateway.warning.includes("网关"));
+
+  const apiKey = qoder.mapQoderDetail(qoderDetail({
+    url: "https://mcp.example.com/mcp",
+    qoder_url: "",
+    protocol: "streamable_http",
+    auth_type: "api_key",
+  }), "https://qoder.cn");
+  assert.equal(apiKey.installable, false);
+  assert.ok(apiKey.warning.includes("API Key"));
+});
+
+await test("写回 Qoder CN settings.json：保留插件 / providers / 原有服务器字段", async () => {
+  const spec = { url: "https://app.xmind.cn/api/mcp", extra: { type: "http" } };
+  const installed = await core.installCatalogServers({ name: "xmind", targets: ["qodercn"], spec }, log);
+  assert.equal(installed.results[0].ok, true, JSON.stringify(installed.results));
+
+  const doc = JSON.parse(await readFile(QODER_CN_SETTINGS, "utf8"));
+  assert.deepEqual(doc.mcpServers.xmind, { type: "http", url: "https://app.xmind.cn/api/mcp" });
+  assert.deepEqual(doc.enabledPlugins, { "demo@qoder-marketplace": true });
+  assert.deepEqual(doc.providers, { demo: { baseUrl: "https://example.com/v1" } });
+  // 原有服务器的 Qoder 专有字段（trust / timeout / includeTools）不能被写丢
+  assert.equal(doc.mcpServers.existing.trust, true);
+  assert.equal(doc.mcpServers.existing.timeout, 30000);
+  assert.deepEqual(doc.mcpServers.existing.includeTools, ["a"]);
+
+  const snap = await core.snapshot();
+  const view = snap.sources.find((source) => source.key === "qodercn");
+  assert.ok(view, "Qoder CN 来源应出现在快照里");
+  assert.ok(view.servers.some((server) => server.name === "xmind" && server.enabled));
+
+  await core.uninstallCatalogServers({ name: "xmind", targets: ["qodercn"] }, log);
+  const after = JSON.parse(await readFile(QODER_CN_SETTINGS, "utf8"));
+  assert.equal(after.mcpServers.xmind, undefined);
+  assert.ok(after.mcpServers.existing);
+  assert.deepEqual(after.enabledPlugins, { "demo@qoder-marketplace": true });
 });
 
 console.log("\n[扫描]");

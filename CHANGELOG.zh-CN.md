@@ -2,7 +2,13 @@
 
 本项目的重要变更都记录在此。格式遵循 [Keep a Changelog](https://keepachangelog.com/)，版本号遵循 [SemVer](https://semver.org/)。
 
-## [未发布]
+## [0.3.0] - 2026-11-24
+
+### 新增
+
+- 新增「Qoder 连接器市场」来源：通过 Qoder 官网公开接口读取 300+ 连接器（按 50 条/页分页抓取，缓存 30 分钟，网络失败回退上次快照并标注）。OAuth 类型连接器可在目录里一键安装，直接写入 `~/.qoder-cn/settings.json` 或 `~/.qoder/settings.json` 的 `mcpServers`（`type: "http"`），写入前照常备份、保留文件里的其它配置；首次连接需在 Qoder 内完成 OAuth 登录。网关托管（`mcp.qoder.cn` / `mcp.qoder.com`）和需要 API Key 的连接器标为「仅浏览」并提示到 Qoder 市场内安装。
+- Qoder 配置文件识别新增 `~/.qoder/settings.json` 和 `~/.qoder-cn/settings.json`（与原有的 `mcp.json` 并存）。
+- WorkBuddy 连接器来源：卡片显示连接器图标（本地读取，不联网）；列表保持 WorkBuddy 市场的原始排序，不再按名称重排。
 
 ## [0.2.0] - 2026-11-18
 

@@ -24,8 +24,10 @@ export interface CatalogEntry {
   titleEn?: string;
   description: string;
   descriptionZh?: string;
-  /** official = modelcontextprotocol/servers；registry = MCP Registry；mcpso = mcp.so 详情页；workbuddy = 本机 WorkBuddy 市场 */
-  source: "official" | "registry" | "mcpso" | "workbuddy";
+  /** official = modelcontextprotocol/servers；registry = MCP Registry；mcpso = mcp.so 详情页；qoder = Qoder 官方市场；workbuddy = 本机 WorkBuddy 市场 */
+  source: "official" | "registry" | "mcpso" | "qoder" | "workbuddy";
+  /** 来源侧的原始 id（Qoder 的 connector_id；安装名另用 slug） */
+  remoteId?: string;
   transport: "stdio" | "http";
   /** 用于识别「已安装」的包名 / 地址 */
   packageId?: string;
@@ -56,6 +58,8 @@ export interface CatalogEntry {
   docUrl?: string;
   docLabel?: string;
   docLabelEn?: string;
+  /** 图标地址（WorkBuddy 本地图标走 host 路由，其它来源可为 https URL） */
+  iconUrl?: string;
 }
 
 /** mcp.so 热门排行榜条目（方案 A：只浏览，不安装）。 */

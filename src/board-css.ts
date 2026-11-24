@@ -421,6 +421,14 @@ export const BOARD_CSS = `
   background:var(--bg-primary-default);
 }
 .dmm-catalog-main { flex:1; min-width:0; }
+.dmm-catalog-icon {
+  flex:none; width:38px; height:38px; border-radius:9px;
+  position:relative; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  background:var(--bg-secondary-default); border:1px solid var(--border-table);
+  color:var(--text-secondary); font-weight:600; font-size:15px;
+}
+.dmm-catalog-icon img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
 .dmm-catalog-title { display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-weight:600; font-size:14px; }
 .dmm-catalog-desc { font-size:13px; line-height:19px; color:var(--text-secondary); margin-top:4px; }
 .dmm-catalog-meta { margin-top:4px; font-size:12px; color:var(--text-tertiary); }

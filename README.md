@@ -29,7 +29,7 @@ This plugin auto-discovers those files, shows them in one panel, and lets you to
 - **Safe writes** — every write snapshots the original file into `~/.dsh/mcp-connectors/backups/` (last 100 kept). Restore any version with one click; the restore itself is backed up too.
 - **Enable / disable** — MCP has no cross-tool `disabled` flag, so disabling removes the entry from the config and keeps its definition in the manager state; enabling writes it back.
 - **Product grouping** — tools that split their config across files (e.g. WorkBuddy user-level + connectors) render as one card, each server still bound to its own file.
-- **Connector catalog** — three sources: the official [MCP Registry](https://registry.modelcontextprotocol.io/) (live search + paging), the [mcp.so Top 100](https://mcp.so/zh/rankings/servers) (details and install, with an offline cache), and the local **WorkBuddy official connector marketplace** (MCP connectors install back into WorkBuddy; CLI connectors are browse-only). Pick target agents, fill in parameters, install in one click; installed entries can be toggled or uninstalled in place. Every entry has a detail view (repository / website, README, launch command, environment, parameters). If all online sources are unavailable and WorkBuddy is not installed, the 7 built-in reference implementations appear as an offline fallback.
+- **Connector catalog** — four sources: the official [MCP Registry](https://registry.modelcontextprotocol.io/) (live search + paging), the [mcp.so Top 100](https://mcp.so/zh/rankings/servers) (details and install, with an offline cache), the local **WorkBuddy official connector marketplace** (MCP connectors install back into WorkBuddy; CLI connectors are browse-only), and the **Qoder official connector marketplace** (300+ connectors via its public API; OAuth connectors install into Qoder / Qoder CN with one click, while gateway-hosted or API-key connectors are marked browse-only with a pointer to install inside Qoder). Pick target agents, fill in parameters, install in one click; installed entries can be toggled or uninstalled in place. Every entry has a detail view (repository / website, README, launch command, environment, parameters). If all online sources are unavailable and WorkBuddy is not installed, the 7 built-in reference implementations appear as an offline fallback.
 - **Drag to reorder** — display-only ordering stored in plugin state; config files are never touched.
 - **Panel that fits the settings page** — vertical layout, sticky section headers, collapsible groups, status/agent filters, back-to-top, and light/dark that follows the host theme.
 
@@ -52,7 +52,8 @@ This plugin auto-discovers those files, shows them in one panel, and lets you to
 | OpenCode | `~/.config/opencode/opencode.json` | JSON `mcp` |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` | JSON `mcpServers` |
 | Trae / Trae CN | `~/.trae/mcp.json`, `~/.trae-cn/mcp.json` | JSON `mcpServers` |
-| Qoder | `~/.qoder/mcp.json` | JSON `mcpServers` |
+| Qoder | `~/.qoder/settings.json`, `~/.qoder/mcp.json` | JSON `mcpServers` |
+| Qoder CN | `~/.qoder-cn/settings.json`, `~/.qoder-cn/mcp.json` | JSON `mcpServers` |
 | CodeBuddy / CN | `~/.codebuddy/mcp.json` | JSON `mcpServers` |
 | WorkBuddy | `~/.workbuddy/mcp.json`, `~/.workbuddy/connectors/default/mcp.json` | JSON `mcpServers` |
 | VS Code | `%APPDATA%/Code/User/mcp.json` | JSONC |

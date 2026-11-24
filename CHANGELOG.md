@@ -2,7 +2,13 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/), versions use [SemVer](https://semver.org/).
 
-## [Unreleased]
+## [0.3.0] - 2026-11-24
+
+### Added
+
+- New "Qoder connector marketplace" source: reads 300+ connectors from Qoder's public marketplace API (50 per page, 30-minute cache, falls back to the last snapshot with a stale marker on network failure). OAuth connectors install in one click into `mcpServers` of `~/.qoder-cn/settings.json` or `~/.qoder/settings.json` (`type: "http"`) with the usual pre-write backup and preservation of other settings; the first connection still requires completing OAuth inside Qoder. Gateway-hosted (`mcp.qoder.cn` / `mcp.qoder.com`) and API-key connectors are marked browse-only with a pointer to install inside the Qoder marketplace.
+- Qoder config discovery now also covers `~/.qoder/settings.json` and `~/.qoder-cn/settings.json` (alongside the existing `mcp.json` paths).
+- WorkBuddy connector cards now show connector icons (read locally, no network) and the list keeps the WorkBuddy marketplace's original order instead of re-sorting by name.
 
 ## [0.2.0] - 2026-11-18
 

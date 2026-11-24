@@ -109,8 +109,20 @@ export const BUILTIN_SOURCES: SourceDef[] = [
     key: "qoder",
     label: "Qoder",
     format: "json-mcpServers",
-    paths: ["~/.qoder/mcp.json"],
+    // 新版 Qoder 把 MCP 放在 settings.json 顶层 mcpServers（旧版 / 兼容路径是 mcp.json）
+    paths: ["~/.qoder/settings.json", "~/.qoder/mcp.json"],
     writable: true,
+    group: "qoder",
+    groupLabel: "Qoder",
+  },
+  {
+    key: "qodercn",
+    label: "Qoder CN",
+    format: "json-mcpServers",
+    paths: ["~/.qoder-cn/settings.json", "~/.qoder-cn/mcp.json"],
+    writable: true,
+    group: "qoder",
+    groupLabel: "Qoder",
   },
   {
     key: "codebuddy",

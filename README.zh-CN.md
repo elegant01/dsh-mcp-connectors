@@ -28,7 +28,7 @@
 - **安全写入**——每次写入前把原文件快照到 `~/.dsh/mcp-connectors/backups/`（保留最近 100 份），任意版本一键恢复；恢复前也会先备份当前内容。
 - **启停**——DSH 条目有原生 `disabled` 字段，直接改这一行；其它工具没有统一字段，停用 = 条目移出配置文件、定义存进管理器状态，启用再写回。
 - **产品归组**——配置分散在多个文件里的工具（如 WorkBuddy 用户级 + 连接器）合成一张卡片，但每台 server 仍绑定自己的文件。
-- **连接器目录**——三个来源：官方 [MCP Registry](https://registry.modelcontextprotocol.io/)（在线搜索 + 分页）、[mcp.so 热门 Top 100](https://mcp.so/zh/rankings/servers)（可详情、可安装，带离线缓存），以及本机 **WorkBuddy 官方连接器市场**（MCP 类型可装回 WorkBuddy，CLI 类型仅展示）。勾选目标 Agent、填好参数后一键安装，已安装的直接启停或卸载。每个条目有详情页（仓库 / 官网地址、README、启动命令、环境变量、参数）。在线来源都不可用且本机没有 WorkBuddy 时，才会露出内置的 7 个官方参考实现作为断网兜底。
+- **连接器目录**——四个来源：官方 [MCP Registry](https://registry.modelcontextprotocol.io/)（在线搜索 + 分页）、[mcp.so 热门 Top 100](https://mcp.so/zh/rankings/servers)（可详情、可安装，带离线缓存）、本机 **WorkBuddy 官方连接器市场**（MCP 类型可装回 WorkBuddy，CLI 类型仅展示），以及 **Qoder 官方连接器市场**（公开接口读取 300+ 连接器；OAuth 连接器一键写入 Qoder / Qoder CN 配置，网关托管或需要 API Key 的标「仅浏览」并提示到 Qoder 内安装）。勾选目标 Agent、填好参数后一键安装，已安装的直接启停或卸载。每个条目有详情页（仓库 / 官网地址、README、启动命令、环境变量、参数）。在线来源都不可用且本机没有 WorkBuddy 时，才会露出内置的 7 个官方参考实现作为断网兜底。
 - **拖拽排序**——顺序只存在插件状态里，配置文件一个字节都不动。
 - **适配设置页的面板**——竖向布局、区块头吸顶、分组可折叠、状态 / Agent 筛选、回到顶部，明暗主题跟随宿主。
 
@@ -51,7 +51,8 @@
 | OpenCode | `~/.config/opencode/opencode.json` | JSON `mcp` |
 | Windsurf | `~/.codeium/windsurf/mcp_config.json` | JSON `mcpServers` |
 | Trae / Trae CN | `~/.trae/mcp.json`、`~/.trae-cn/mcp.json` | JSON `mcpServers` |
-| Qoder | `~/.qoder/mcp.json` | JSON `mcpServers` |
+| Qoder | `~/.qoder/settings.json`、`~/.qoder/mcp.json` | JSON `mcpServers` |
+| Qoder CN | `~/.qoder-cn/settings.json`、`~/.qoder-cn/mcp.json` | JSON `mcpServers` |
 | CodeBuddy / 国内版 | `~/.codebuddy/mcp.json` | JSON `mcpServers` |
 | WorkBuddy | `~/.workbuddy/mcp.json`、`~/.workbuddy/connectors/default/mcp.json` | JSON `mcpServers` |
 | VS Code | `%APPDATA%/Code/User/mcp.json` | JSONC |

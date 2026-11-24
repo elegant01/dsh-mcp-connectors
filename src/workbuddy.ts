@@ -37,6 +37,35 @@ function connectorDir(id: string): string {
   return join(marketplaceRoot(), "connectors", id);
 }
 
+function iconsDir(): string {
+  return join(marketplaceRoot(), "icons");
+}
+
+const ICON_TYPES: Record<string, string> = {
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".webp": "image/webp",
+  ".gif": "image/gif",
+};
+
+/** 读取 WorkBuddy 市场里某个连接器的图标（本地文件，不联网）。 */
+export async function findWorkBuddyIcon(id: string): Promise<{ data: Buffer; contentType: string } | null> {
+  if (!/^[A-Za-z0-9_.-]{1,120}$/.test(id)) return null;
+  for (const ext of Object.keys(ICON_TYPES)) {
+    try {
+      const data = await readFile(join(iconsDir(), `${id}${ext}`));
+      return { data, contentType: ICON_TYPES[ext] };
+    } catch { /* 尝试下一个扩展名 */ }
+  }
+  return null;
+}
+
+function iconPathFor(id: string): string {
+  return `/api/dsh-mcp-connectors/catalog/workbuddy/icon?name=${encodeURIComponent(id)}`;
+}
+
 async function readJson(file: string): Promise<Record<string, unknown> | null> {
   try {
     const parsed = JSON.parse(await readFile(file, "utf8").catch(() => ""));
@@ -191,12 +220,14 @@ function mapMcpConnector(
     docLabelEn: schema.docLabelEn,
     warning,
     tags: ["mcp"],
+    iconUrl: iconPathFor(connectorId),
   };
 }
 
 function mapCliConnector(connector: Record<string, unknown>): CatalogEntry {
+  const connectorId = str(connector.source) ?? str(connector.id) ?? "connector";
   return {
-    id: `cli:${str(connector.id) ?? str(connector.source) ?? "connector"}`,
+    id: `cli:${connectorId}`,
     title: str(connector.name) ?? str(connector.id) ?? "WorkBuddy CLI",
     titleEn: str(connector.name_en),
     description: str(connector.description_en) ?? str(connector.description) ?? "",
@@ -209,6 +240,7 @@ function mapCliConnector(connector: Record<string, unknown>): CatalogEntry {
     examplesEn: stringArray(connector.examples_en)?.slice(0, 3),
     warning: "这是 WorkBuddy 的 CLI 型连接器，需要 WorkBuddy 客户端完成安装与登录，不能作为 MCP 服务器写入其它 Agent。",
     tags: ["cli"],
+    iconUrl: iconPathFor(connectorId),
   };
 }
 
@@ -257,10 +289,7 @@ export async function loadWorkBuddyCatalog(): Promise<WorkBuddyCatalog> {
     }
   }
 
-  items.sort((a, b) => {
-    if ((a.installable !== false) !== (b.installable !== false)) return a.installable === false ? 1 : -1;
-    return a.title.localeCompare(b.title);
-  });
+  // 保持 connectors.json 的原始顺序（WorkBuddy 自己的展示顺序），不再按名称重排
 
   const catalog: WorkBuddyCatalog = {
     available: true,

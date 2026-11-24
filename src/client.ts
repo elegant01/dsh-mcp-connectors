@@ -126,7 +126,7 @@ export const ZH: Dict = {
   backToTop: "回到顶部",
   discover: "发现连接器",
   catalogTitle: "发现连接器",
-  catalogSubtitle: "从 MCP Registry、mcp.so 或 WorkBuddy 市场发现连接器，选中 Agent 后一键安装",
+  catalogSubtitle: "从 MCP Registry、mcp.so、Qoder 或 WorkBuddy 市场发现连接器，选中 Agent 后一键安装",
   catalogOfficial: "官方参考",
   catalogRegistry: "在线发现",
   catalogSearchPlaceholder: "搜索 MCP Registry（名称 / 描述）…",
@@ -184,13 +184,21 @@ export const ZH: Dict = {
   catalogWorkbuddyHint: "读取本机 WorkBuddy 官方连接器市场；MCP 类型可安装到 WorkBuddy，CLI 类型仅展示。",
   catalogWorkbuddyLoading: "正在读取 WorkBuddy 连接器…",
   catalogWorkbuddyFailed: "WorkBuddy 连接器读取失败",
+  catalogQoder: "Qoder 连接器市场",
+  catalogQoderHint: "读取 Qoder 官方连接器市场（公开接口）。OAuth 连接器可一键写入 Qoder；网关托管或需要 API Key 的连接器请到 Qoder 市场内安装。",
+  catalogQoderLoading: "正在读取 Qoder 连接器市场…",
+  catalogQoderFailed: "Qoder 连接器市场读取失败",
+  catalogQoderStale: "当前无法访问 Qoder 市场，显示的是上次成功抓取的缓存。",
+  catalogQoderDetailLoading: "正在读取连接器详情…",
+  catalogQoderDetailFailed: "Qoder 连接器详情读取失败",
+  catalogBrowseOnly: "仅浏览",
   catalogInstallable: "可安装",
   catalogCliOnly: "CLI（仅 WorkBuddy）",
   catalogFilter: "筛选",
   catalogRetry: "重试",
   catalogExamples: "使用示例",
   catalogGetCredential: "获取凭据 / 查看文档",
-  catalogFixedTarget: "安装目标固定为 WorkBuddy",
+  catalogFixedTarget: "安装目标固定为",
   catalogWbNotInstalled: "未检测到 WorkBuddy 连接器市场。",
   catalogConnectorsUnit: "个连接器",
   catalogOfflineTitle: "离线可用的内置参考实现",
@@ -285,7 +293,7 @@ const EN: Dict = {
   backToTop: "Back to top",
   discover: "Discover connectors",
   catalogTitle: "Discover connectors",
-  catalogSubtitle: "Find connectors on MCP Registry, mcp.so or the WorkBuddy marketplace, then install into the selected agents",
+  catalogSubtitle: "Find connectors on MCP Registry, mcp.so, the Qoder marketplace or WorkBuddy, then install into the selected agents",
   catalogOfficial: "Official reference",
   catalogRegistry: "Online",
   catalogSearchPlaceholder: "Search MCP Registry (name / description)…",
@@ -343,13 +351,21 @@ const EN: Dict = {
   catalogWorkbuddyHint: "Reads the local WorkBuddy official connector marketplace. MCP connectors install into WorkBuddy; CLI connectors are browse-only.",
   catalogWorkbuddyLoading: "Loading WorkBuddy connectors…",
   catalogWorkbuddyFailed: "Failed to load WorkBuddy connectors",
+  catalogQoder: "Qoder connectors",
+  catalogQoderHint: "Reads the official Qoder connector marketplace (public API). OAuth connectors can be written into Qoder directly; gateway-hosted or API-key connectors must be installed inside Qoder.",
+  catalogQoderLoading: "Loading Qoder connectors…",
+  catalogQoderFailed: "Failed to load Qoder connectors",
+  catalogQoderStale: "The Qoder marketplace is unreachable; showing the last successful snapshot.",
+  catalogQoderDetailLoading: "Loading connector details…",
+  catalogQoderDetailFailed: "Failed to load Qoder connector details",
+  catalogBrowseOnly: "Browse only",
   catalogInstallable: "Installable",
   catalogCliOnly: "CLI (WorkBuddy only)",
   catalogFilter: "Filter",
   catalogRetry: "Retry",
   catalogExamples: "Examples",
   catalogGetCredential: "Get credentials / docs",
-  catalogFixedTarget: "Target is fixed to WorkBuddy",
+  catalogFixedTarget: "Target is fixed to",
   catalogWbNotInstalled: "WorkBuddy connector marketplace was not found.",
   catalogConnectorsUnit: "connectors",
   catalogOfflineTitle: "Built-in reference implementations (offline)",
@@ -1193,10 +1209,11 @@ function CatalogModal(props: {
 }) {
   const { t, sources, refresh, toast, close } = props;
   const isZh = t("title") === ZH.title;
-  type Tab = "registry" | "mcpso" | "workbuddy";
+  type Tab = "registry" | "mcpso" | "qoder" | "workbuddy";
   interface RankingsPayload { items: RankingEntry[]; fetchedAt: string; stale: boolean; source: string; error?: string }
   interface WorkBuddyStatus { available: boolean; count: number; installable: number }
   interface WorkBuddyCatalog extends WorkBuddyStatus { items: CatalogEntry[]; fetchedAt: string }
+  interface QoderCatalogPayload { items: CatalogEntry[]; fetchedAt: string; stale: boolean; source: string; error?: string }
 
   const [tab, setTab] = useState<Tab>("registry");
   const [query, setQuery] = useState("");
@@ -1219,6 +1236,11 @@ function CatalogModal(props: {
   const [wbLoading, setWbLoading] = useState(false);
   const [wbError, setWbError] = useState<string | null>(null);
   const [wbQuery, setWbQuery] = useState("");
+  const [qoder, setQoder] = useState<QoderCatalogPayload | null>(null);
+  const [qLoading, setQLoading] = useState(false);
+  const [qError, setQError] = useState<string | null>(null);
+  const [qQuery, setQQuery] = useState("");
+  const [qDetailLoading, setQDetailLoading] = useState<string | null>(null);
   const [rankDetailLoading, setRankDetailLoading] = useState<string | null>(null);
   interface RankingDetailPayload {
     id: string; url: string; title?: string; description?: string; repository?: string;
@@ -1293,6 +1315,53 @@ function CatalogModal(props: {
   useEffect(() => {
     if (tab === "workbuddy" && wbStatus?.available && !workbuddy && !wbLoading && !wbError) void loadWorkbuddy();
   }, [tab, wbStatus, workbuddy, wbLoading, wbError, loadWorkbuddy]);
+
+  const loadQoder = useCallback(async () => {
+    setQLoading(true);
+    setQError(null);
+    try {
+      setQoder(await callApi<QoderCatalogPayload>("/catalog/qoder"));
+    } catch (caught) {
+      setQError(`${t("catalogQoderFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+    } finally {
+      setQLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (tab === "qoder" && !qoder && !qLoading && !qError) void loadQoder();
+  }, [tab, qoder, qLoading, qError, loadQoder]);
+
+  // Qoder 市场条目的安装配置在详情接口里；点「详情/安装」时按需抓取后再决定能否直接写回
+  const openQoderDetail = useCallback(async (item: CatalogEntry, mode: "detail" | "install") => {
+    const remoteId = item.remoteId ?? item.id;
+    setQDetailLoading(remoteId);
+    try {
+      const detail = await callApi<CatalogEntry>(`/catalog/qoder/detail?id=${encodeURIComponent(remoteId)}`);
+      const target = sources.some((source) => source.key === "qodercn")
+        ? "qodercn"
+        : sources.some((source) => source.key === "qoder")
+          ? "qoder"
+          : undefined;
+      const entry: CatalogEntry = {
+        ...item,
+        ...detail,
+        id: item.id,
+        remoteId,
+        title: detail.title || item.title,
+        titleEn: detail.titleEn || item.titleEn,
+        descriptionZh: detail.descriptionZh ?? item.descriptionZh,
+        iconUrl: item.iconUrl ?? detail.iconUrl,
+        installTarget: detail.installable === false ? undefined : target,
+      };
+      if (mode === "install" && entry.installable !== false) setInstallEntry(entry);
+      else setDetailEntry(entry);
+    } catch (caught) {
+      toast(`${t("catalogQoderDetailFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`, true);
+    } finally {
+      setQDetailLoading(null);
+    }
+  }, [sources, t, toast]);
 
   const openRankingDetail = useCallback(async (item: RankingEntry, mode: "detail" | "install") => {
     setRankDetailLoading(item.id);
@@ -1384,12 +1453,28 @@ function CatalogModal(props: {
     });
   }
 
-  const card = (entry: CatalogEntry) => {
+  const card = (entry: CatalogEntry, handlers?: {
+    onDetail?: () => void;
+    onInstall?: () => void;
+    busy?: boolean;
+  }) => {
     const installed = installationsOf(entry);
+    const displayTitle = isZh ? entry.title : entry.titleEn ?? entry.title;
+    const iconSrc = entry.iconUrl
+      ? (/^(https?:|data:)/i.test(entry.iconUrl) ? entry.iconUrl : resolveApiUrl(entry.iconUrl))
+      : null;
     return h("div", { className: "dmm-catalog-card", key: entry.id },
+      iconSrc
+        ? h("span", { className: "dmm-catalog-icon", key: "icon" },
+            h("span", { className: "dmm-catalog-icon-fallback", "aria-hidden": true }, displayTitle.trim().slice(0, 1).toUpperCase() || "?"),
+            h("img", {
+              src: iconSrc, alt: "", loading: "lazy",
+              onError: (event: React.SyntheticEvent<HTMLImageElement>) => { event.currentTarget.style.display = "none"; },
+            }))
+        : null,
       h("div", { className: "dmm-catalog-main" },
         h("div", { className: "dmm-catalog-title" },
-          isZh ? entry.title : entry.titleEn ?? entry.title,
+          displayTitle,
           h("span", { className: "dmm-tag gray" }, entry.transport),
           entry.source === "official"
             ? h("span", { className: "dmm-tag blue" }, t("catalogOfficial"))
@@ -1397,8 +1482,12 @@ function CatalogModal(props: {
               ? h("span", { className: "dmm-tag cyan" }, t("catalogRegistry"))
               : entry.source === "mcpso"
                 ? h("span", { className: "dmm-tag accent" }, t("catalogMcpso"))
-                : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
-          entry.installable === false ? h("span", { className: "dmm-tag yellow" }, t("catalogCliOnly")) : null,
+                : entry.source === "qoder"
+                  ? h("span", { className: "dmm-tag purple" }, t("catalogQoder"))
+                  : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
+          entry.installable === false
+            ? h("span", { className: "dmm-tag yellow" }, entry.source === "qoder" ? t("catalogBrowseOnly") : t("catalogCliOnly"))
+            : null,
           installed.length ? h("span", { className: "dmm-tag green" }, `${t("catalogInstalled")} ${installed.length}`) : null),
         h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
         entry.packageId || entry.repository
@@ -1436,10 +1525,18 @@ function CatalogModal(props: {
           }))
           : null),
       h("div", { className: "dmm-catalog-actions" },
-        h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", onClick: () => setDetailEntry(entry) }, t("catalogDetails")),
+        h("button", {
+          className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+          disabled: handlers?.busy === true,
+          onClick: handlers?.onDetail ?? (() => setDetailEntry(entry)),
+        }, t("catalogDetails")),
         entry.installable === false
           ? null
-          : h("button", { className: "dmm-btn dmm-btn-primary dmm-btn-sm", onClick: () => setInstallEntry(entry) }, t("catalogInstall"))));
+          : h("button", {
+              className: "dmm-btn dmm-btn-primary dmm-btn-sm",
+              disabled: handlers?.busy === true,
+              onClick: handlers?.onInstall ?? (() => setInstallEntry(entry)),
+            }, handlers?.busy === true ? t("catalogQoderDetailLoading") : t("catalogInstall"))));
   };
 
   const rankCard = (item: RankingEntry) =>
@@ -1478,6 +1575,10 @@ function CatalogModal(props: {
   const wbList = (workbuddy?.items ?? []).filter((item) =>
     !wbFilter || `${item.title} ${item.titleEn ?? ""} ${item.description} ${item.descriptionZh ?? ""} ${(item.examples ?? []).join(" ")}`
       .toLowerCase().includes(wbFilter));
+  const qFilter = qQuery.trim().toLowerCase();
+  const qList = (qoder?.items ?? []).filter((item) =>
+    !qFilter || `${item.title} ${item.titleEn ?? ""} ${item.description} ${item.descriptionZh ?? ""} ${(item.tags ?? []).join(" ")}`
+      .toLowerCase().includes(qFilter));
 
   const tabButton = (key: Tab, label: string) =>
     h("button", { key, "aria-selected": tab === key, onClick: () => setTab(key) }, label);
@@ -1485,12 +1586,14 @@ function CatalogModal(props: {
   const sourceLabel =
     tab === "registry" ? "MCP Registry"
       : tab === "mcpso" ? "mcp.so"
-        : "WorkBuddy";
+        : tab === "qoder" ? "Qoder"
+          : "WorkBuddy";
 
   // 断网兜底：在线来源都失败且本机没有 WorkBuddy 时，才露出内置的 7 个参考实现
   const showOfflineFallback = !wbStatus?.available && (
     (tab === "registry" && Boolean(error) && registryList.length === 0) ||
-    (tab === "mcpso" && Boolean(rankError) && !(rankings?.items?.length))
+    (tab === "mcpso" && Boolean(rankError) && !(rankings?.items?.length)) ||
+    (tab === "qoder" && Boolean(qError) && !(qoder?.items?.length))
   );
 
   return h(ModalShell, { onClose: close, wide: true },
@@ -1499,6 +1602,7 @@ function CatalogModal(props: {
       h("div", { className: "dmm-segmented" },
         tabButton("registry", t("catalogRegistry")),
         tabButton("mcpso", t("catalogMcpso")),
+        tabButton("qoder", t("catalogQoder")),
         wbStatus?.available ? tabButton("workbuddy", t("catalogWorkbuddy")) : null),
       h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))),
     h("div", { className: "dmm-modal-body" },
@@ -1519,7 +1623,7 @@ function CatalogModal(props: {
         !loading && !error && searched && registryList.length === 0
           ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults"))
           : null,
-        h("div", { className: "dmm-catalog-list", key: "list" }, registryList.map(card)),
+        h("div", { className: "dmm-catalog-list", key: "list" }, registryList.map((entry) => card(entry))),
         registryList.length
           ? h("div", { className: "dmm-catalog-more", key: "more" },
               h("span", { className: "dmm-field-hint" }, `${t("catalogLoaded")} ${registryList.length}`),
@@ -1558,6 +1662,35 @@ function CatalogModal(props: {
         rankings && !rankList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
       ] : null,
 
+      tab === "qoder" ? [
+        h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogQoderHint")),
+        qoder && !qoder.stale
+          ? h("div", { className: "dmm-field-hint", key: "summary" },
+              `${qoder.items.length} ${t("catalogConnectorsUnit")} · ${new Date(qoder.fetchedAt).toLocaleString()}`)
+          : null,
+        qoder?.stale
+          ? h("div", { className: "dmm-warn", key: "stale" },
+              `${t("catalogQoderStale")}${qoder.error ? `（${qoder.error}）` : ""} · ${new Date(qoder.fetchedAt).toLocaleString()}`)
+          : null,
+        h("div", { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
+          h("input", {
+            className: "dmm-input", value: qQuery, placeholder: `${t("catalogFilter")}…`,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setQQuery(e.target.value),
+          })),
+        qLoading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogQoderLoading")) : null,
+        qError && !qoder
+          ? h("div", { key: "error" },
+              h("div", { className: "dmm-warn" }, qError),
+              h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadQoder() }, t("catalogRetry")))
+          : null,
+        h("div", { className: "dmm-catalog-list", key: "list" }, qList.map((entry) => card(entry, {
+          busy: qDetailLoading === (entry.remoteId ?? entry.id),
+          onDetail: () => void openQoderDetail(entry, "detail"),
+          onInstall: () => void openQoderDetail(entry, "install"),
+        }))),
+        qoder && !qList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
+      ] : null,
+
       tab === "workbuddy" ? [
         h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogWorkbuddyHint")),
         workbuddy
@@ -1575,7 +1708,7 @@ function CatalogModal(props: {
               h("div", { className: "dmm-warn" }, wbError),
               h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadWorkbuddy() }, t("catalogRetry")))
           : null,
-        h("div", { className: "dmm-catalog-list", key: "list" }, wbList.map(card)),
+        h("div", { className: "dmm-catalog-list", key: "list" }, wbList.map((entry) => card(entry))),
         workbuddy && !wbList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
         !wbStatus?.available ? h("div", { className: "dmm-empty", key: "noWB" }, t("catalogWbNotInstalled")) : null,
       ] : null,
@@ -1584,7 +1717,7 @@ function CatalogModal(props: {
         ? h("div", { className: "dmm-detail-section", key: "offline" },
             h("div", { className: "dmm-detail-section-title" }, t("catalogOfflineTitle")),
             h("div", { className: "dmm-field-hint", style: { marginBottom: 6 } }, t("catalogOfflineHint")),
-            h("div", { className: "dmm-catalog-list" }, OFFICIAL_CATALOG.map(card)))
+            h("div", { className: "dmm-catalog-list" }, OFFICIAL_CATALOG.map((entry) => card(entry))))
         : null),
     h("div", { className: "dmm-modal-foot" },
       h("span", { className: "dmm-field-hint", style: { marginRight: "auto" } }, sourceLabel),
@@ -1734,8 +1867,12 @@ function CatalogDetailView(props: {
             ? h("span", { className: "dmm-tag cyan" }, t("catalogRegistry"))
             : entry.source === "mcpso"
               ? h("span", { className: "dmm-tag accent" }, t("catalogMcpso"))
-              : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
-        entry.installable === false ? h("span", { className: "dmm-tag yellow" }, t("catalogCliOnly")) : null,
+              : entry.source === "qoder"
+                ? h("span", { className: "dmm-tag purple" }, t("catalogQoder"))
+                : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
+        entry.installable === false
+          ? h("span", { className: "dmm-tag yellow" }, entry.source === "qoder" ? t("catalogBrowseOnly") : t("catalogCliOnly"))
+          : null,
         ...(entry.tags ?? []).map((tag) => h("span", { className: "dmm-tag gray", key: tag }, tag))),
       h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
       entry.warning ? h("div", { className: "dmm-catalog-warn" }, entry.warning) : null,
@@ -1746,7 +1883,7 @@ function CatalogDetailView(props: {
               examples.map((example, index) => h("li", { key: index }, example))))
         : null,
 
-      entry.source !== "workbuddy"
+      entry.source !== "workbuddy" && entry.source !== "qoder"
         ? h("div", { className: "dmm-detail-section" },
             sectionTitle(t("catalogReadme")),
             readmeLoading
