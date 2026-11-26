@@ -2,7 +2,7 @@
 
 本项目的重要变更都记录在此。格式遵循 [Keep a Changelog](https://keepachangelog.com/)，版本号遵循 [SemVer](https://semver.org/)。
 
-## [未发布]
+## [0.3.1] - 2026-11-26
 
 ### 修复
 
