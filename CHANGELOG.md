@@ -7,6 +7,7 @@ All notable changes to this project are documented here. Format follows [Keep a 
 ### Fixed
 
 - The connector catalog modal now has a fixed height (`min(760px, viewport height)`), so it no longer starts short while loading and jumps taller when results arrive; the list scrolls inside the modal instead.
+- Catalog loading states now use skeleton cards (6 placeholders with a pulse animation that respects `prefers-reduced-motion`); the error message and retry button appear only when a request actually fails.
 
 ## [0.3.0] - 2026-11-24
 

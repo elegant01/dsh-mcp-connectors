@@ -424,6 +424,12 @@ export const BOARD_CSS = `
   background:var(--bg-primary-default);
 }
 .dmm-catalog-main { flex:1; min-width:0; }
+/* 加载骨架屏：脉冲占位，不做整卡透明 */
+.dmm-skel { background:var(--bg-secondary-default); border-radius:6px; animation:dmm-skel-pulse 1.3s ease-in-out infinite; }
+.dmm-skel-icon { flex:none; width:38px; height:38px; border-radius:9px; }
+.dmm-skel-line { height:12px; }
+@keyframes dmm-skel-pulse { 0%,100% { opacity:.55; } 50% { opacity:1; } }
+@media (prefers-reduced-motion: reduce) { .dmm-skel { animation:none; } }
 .dmm-catalog-icon {
   flex:none; width:38px; height:38px; border-radius:9px;
   position:relative; overflow:hidden;

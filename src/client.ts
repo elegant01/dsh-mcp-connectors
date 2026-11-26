@@ -1456,6 +1456,17 @@ function CatalogModal(props: {
     });
   }
 
+  // 加载态骨架屏：占位卡片撑住弹层内容，失败时才换成错误提示
+  const skeletonList = (ariaLabel: string, count = 6) =>
+    h("div", { className: "dmm-catalog-list", role: "status", "aria-label": ariaLabel },
+      Array.from({ length: count }, (_, index) =>
+        h("div", { className: "dmm-catalog-card", key: `skel${index}`, "aria-hidden": true },
+          h("span", { className: "dmm-skel dmm-skel-icon" }),
+          h("div", { className: "dmm-catalog-main" },
+            h("div", { className: "dmm-skel dmm-skel-line", style: { width: "38%" } }),
+            h("div", { className: "dmm-skel dmm-skel-line", style: { width: "86%", marginTop: 10 } }),
+            h("div", { className: "dmm-skel dmm-skel-line", style: { width: "58%", marginTop: 6 } })))));
+
   const card = (entry: CatalogEntry, handlers?: {
     onDetail?: () => void;
     onInstall?: () => void;
@@ -1621,7 +1632,7 @@ function CatalogModal(props: {
           h("button", { className: "dmm-btn dmm-btn-secondary", onClick: () => void runSearch(query) }, icon(ICONS.search, 13), t("catalogSearch"))),
         h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogRegistryHint")),
         !searched && !loading ? h("div", { className: "dmm-empty", key: "emptyq" }, t("catalogEmptyQuery")) : null,
-        loading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogLoading")) : null,
+        loading && registryList.length === 0 ? h("div", { key: "loading" }, skeletonList(t("catalogLoading"))) : null,
         error ? h("div", { className: "dmm-warn", key: "error" }, error) : null,
         !loading && !error && searched && registryList.length === 0
           ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults"))
@@ -1647,7 +1658,7 @@ function CatalogModal(props: {
             className: "dmm-input", value: rankQuery, placeholder: `${t("catalogFilter")}…`,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setRankQuery(e.target.value),
           })),
-        rankLoading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogMcpsoLoading")) : null,
+        rankLoading && !rankings ? h("div", { key: "loading" }, skeletonList(t("catalogMcpsoLoading"))) : null,
         rankError && !rankings
           ? h("div", { key: "error" },
               h("div", { className: "dmm-warn" }, rankError),
@@ -1680,7 +1691,7 @@ function CatalogModal(props: {
             className: "dmm-input", value: qQuery, placeholder: `${t("catalogFilter")}…`,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setQQuery(e.target.value),
           })),
-        qLoading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogQoderLoading")) : null,
+        qLoading && !qoder ? h("div", { key: "loading" }, skeletonList(t("catalogQoderLoading"))) : null,
         qError && !qoder
           ? h("div", { key: "error" },
               h("div", { className: "dmm-warn" }, qError),
@@ -1705,7 +1716,7 @@ function CatalogModal(props: {
             className: "dmm-input", value: wbQuery, placeholder: `${t("catalogFilter")}…`,
             onChange: (e: React.ChangeEvent<HTMLInputElement>) => setWbQuery(e.target.value),
           })),
-        wbLoading ? h("div", { className: "dmm-empty", key: "loading" }, t("catalogWorkbuddyLoading")) : null,
+        wbLoading && !workbuddy ? h("div", { key: "loading" }, skeletonList(t("catalogWorkbuddyLoading"))) : null,
         wbError && !workbuddy
           ? h("div", { key: "error" },
               h("div", { className: "dmm-warn" }, wbError),
