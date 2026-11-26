@@ -335,6 +335,9 @@ export const BOARD_CSS = `
   box-shadow:0 12px 40px rgba(10,10,10,.2);
   overflow:hidden;
 }
+/* 目录弹层固定高度：加载 / 结果切换时窗口不伸缩，列表在内部滚动 */
+.dmm-modal.dmm-modal-fixed { height:min(760px, calc(100vh - 96px)); }
+.dmm-modal-fixed .dmm-modal-body { flex:1; min-height:0; }
 .dmm-modal-head { display:flex; align-items:center; gap:10px; padding:16px 16px 12px; }
 .dmm-modal-title { font-size:16px; line-height:22px; font-weight:600; flex:1; }
 .dmm-modal-body { padding:0 16px 16px; overflow-y:auto; display:flex; flex-direction:column; gap:12px; }

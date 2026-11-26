@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/), versions use [SemVer](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+
+- The connector catalog modal now has a fixed height (`min(760px, viewport height)`), so it no longer starts short while loading and jumps taller when results arrive; the list scrolls inside the modal instead.
+
 ## [0.3.0] - 2026-11-24
 
 ### Added

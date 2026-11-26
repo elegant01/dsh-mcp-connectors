@@ -509,8 +509,8 @@ function useHostTheme(): "light" | "dark" {
 }
 
 // ---------- 弹窗外壳：ESC 只关最上层弹窗，不透传给宿主（宿主 ESC 会关整个设置页） ----------
-function ModalShell(props: { onClose: () => void; wide?: boolean; children?: React.ReactNode }) {
-  const { onClose, wide, children } = props;
+function ModalShell(props: { onClose: () => void; wide?: boolean; fixedHeight?: boolean; children?: React.ReactNode }) {
+  const { onClose, wide, fixedHeight, children } = props;
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (e.key !== "Escape") return;
@@ -525,7 +525,10 @@ function ModalShell(props: { onClose: () => void; wide?: boolean; children?: Rea
   return h("div", {
     className: "dmm-overlay",
     onMouseDown: (e: React.MouseEvent) => { if (e.target === e.currentTarget) onClose(); },
-  }, h("div", { className: "dmm-modal", style: wide ? { width: 680 } : undefined }, children));
+  }, h("div", {
+    className: fixedHeight ? "dmm-modal dmm-modal-fixed" : "dmm-modal",
+    style: wide ? { width: 680 } : undefined,
+  }, children));
 }
 
 // ---------- Modal ----------
@@ -1596,7 +1599,7 @@ function CatalogModal(props: {
     (tab === "qoder" && Boolean(qError) && !(qoder?.items?.length))
   );
 
-  return h(ModalShell, { onClose: close, wide: true },
+  return h(ModalShell, { onClose: close, wide: true, fixedHeight: true },
     h("div", { className: "dmm-modal-head" },
       h("div", { className: "dmm-modal-title" }, t("catalogTitle")),
       h("div", { className: "dmm-segmented" },
