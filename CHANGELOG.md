@@ -8,6 +8,7 @@ All notable changes to this project are documented here. Format follows [Keep a 
 
 - The connector catalog modal now has a fixed height (`min(760px, viewport height)`), so it no longer starts short while loading and jumps taller when results arrive; the list scrolls inside the modal instead.
 - Catalog loading states now use skeleton cards (6 placeholders with a pulse animation that respects `prefers-reduced-motion`); the error message and retry button appear only when a request actually fails.
+- Each agent's connector list now starts collapsed every time the panel is opened (the expanded state is no longer persisted across sessions), and the collapse animation no longer gets stuck open on some Chromium builds (the unreliable `grid-template-rows` height transition was removed).
 - The README area in the connector detail modal uses the same skeleton treatment, shows the error with a retry button only on failure, and now has a fixed-height (`min(340px, 46vh)`) scroll box so the modal no longer grows when the README arrives; the "View on GitHub" link is always available.
 
 ## [0.3.0] - 2026-11-24

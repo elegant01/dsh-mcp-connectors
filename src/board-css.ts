@@ -231,7 +231,8 @@ export const BOARD_CSS = `
 }
 
 /* ---------- 折叠动画（grid-rows 0fr↔1fr 技巧） ---------- */
-.dmm-collapse { display:grid; grid-template-rows:1fr; transition:grid-template-rows .24s var(--ease); }
+/* 不做高度过渡：grid-template-rows 的 fr 过渡在部分 Chromium 上会卡在展开高度，导致收不起来 */
+.dmm-collapse { display:grid; grid-template-rows:1fr; }
 .dmm-collapse.closed { grid-template-rows:0fr; }
 .dmm-collapse-inner { overflow:hidden; min-height:0; }
 

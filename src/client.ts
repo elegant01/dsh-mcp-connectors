@@ -557,13 +557,8 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [busy, setBusy] = useState<string | null>(null);
   const [draggingKey, setDraggingKey] = useState<string | null>(null);
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
-    try {
-      return JSON.parse(localStorage.getItem("dmm-collapsed") || "{}");
-    } catch {
-      return {};
-    }
-  });
+  // 不跨会话记忆：各 Agent 的连接器列表每次打开面板都从收起开始
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const theme = useHostTheme();
   const toastSeq = useRef(0);
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -643,14 +638,6 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
     const id = ++toastSeq.current;
     setToasts((list) => [...list, { id, text, err }]);
     setTimeout(() => setToasts((list) => list.filter((item) => item.id !== id)), 2600);
-  }, []);
-
-  const setCollapsedPersist = useCallback((updater: (cur: Record<string, boolean>) => Record<string, boolean>) => {
-    setCollapsed((cur) => {
-      const next = updater(cur);
-      try { localStorage.setItem("dmm-collapsed", JSON.stringify(next)); } catch { /* ignore */ }
-      return next;
-    });
   }, []);
 
   const refresh = useCallback(async () => {
@@ -827,7 +814,7 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
     const primary = groupSources[0];
     const hasError = groupSources.some((s) => s.error);
     const readonly = groupSources.every((s) => !s.writable);
-    const toggle = () => setCollapsedPersist((cur) => ({ ...cur, [key]: !isCollapsed }));
+    const toggle = () => setCollapsed((cur) => ({ ...cur, [key]: !isCollapsed }));
     return h("section", { className: "dmm-card", key },
       h("div", {
         className: "dmm-card-head", role: "button", tabIndex: 0, "aria-expanded": !isCollapsed,
@@ -911,7 +898,7 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
           className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
           onClick: () => {
             const allCollapsedNow = grouped.every((g) => collapsed[g.key] !== false);
-            setCollapsedPersist((cur) => {
+            setCollapsed((cur) => {
               const next = { ...cur };
               for (const g of grouped) next[g.key] = !allCollapsedNow ? true : false;
               return next;
