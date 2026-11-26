@@ -1828,6 +1828,7 @@ function CatalogDetailView(props: {
   const [readme, setReadme] = useState<{ text: string; url: string; truncated: boolean } | null>(null);
   const [readmeError, setReadmeError] = useState<string | null>(null);
   const [readmeLoading, setReadmeLoading] = useState(Boolean(entry.repository));
+  const [readmeNonce, setReadmeNonce] = useState(0);
 
   useEffect(() => {
     let alive = true;
@@ -1849,7 +1850,7 @@ function CatalogDetailView(props: {
         if (alive) setReadmeLoading(false);
       });
     return () => { alive = false; };
-  }, [entry.repository]);
+  }, [entry.repository, readmeNonce]);
 
   const fieldLabel = (field: CatalogField) => (isZh ? field.label : field.labelEn ?? field.label);
   const examples = (isZh ? entry.examples ?? entry.examplesEn : entry.examplesEn ?? entry.examples) ?? [];
@@ -1901,13 +1902,30 @@ function CatalogDetailView(props: {
         ? h("div", { className: "dmm-detail-section" },
             sectionTitle(t("catalogReadme")),
             readmeLoading
-              ? h("div", { className: "dmm-field-hint" }, t("catalogReadmeLoading"))
+              ? h("div", { className: "dmm-readme", role: "status", "aria-label": t("catalogReadmeLoading") },
+                  h("div", { className: "dmm-readme-skel" },
+                    h("div", { className: "dmm-skel", style: { width: "42%", height: 16 } }),
+                    h("div", { className: "dmm-skel dmm-skel-line", style: { width: "96%" } }),
+                    h("div", { className: "dmm-skel dmm-skel-line", style: { width: "88%" } }),
+                    h("div", { className: "dmm-skel dmm-skel-line", style: { width: "93%" } }),
+                    h("div", { className: "dmm-skel dmm-skel-line", style: { width: "61%" } }),
+                    h("div", { className: "dmm-skel", style: { width: "34%", height: 16, marginTop: 6 } }),
+                    h("div", { className: "dmm-skel dmm-skel-line", style: { width: "91%" } }),
+                    h("div", { className: "dmm-skel dmm-skel-line", style: { width: "74%" } })))
               : readme
                 ? renderMarkdown(readme.text)
-                : h("div", { className: "dmm-field-hint" },
-                    entry.repository ? `${t("catalogReadmeFailed")}: ${readmeError ?? ""}` : t("catalogNoRepo")),
+                : h("div", { className: "dmm-readme" },
+                    h("div", { className: "dmm-field-hint" },
+                      entry.repository ? `${t("catalogReadmeFailed")}: ${readmeError ?? ""}` : t("catalogNoRepo")),
+                    entry.repository && readmeError
+                      ? h("button", {
+                          className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                          style: { marginTop: 8 },
+                          onClick: () => setReadmeNonce((value) => value + 1),
+                        }, t("catalogRetry"))
+                      : null),
             readme?.truncated ? h("div", { className: "dmm-field-hint" }, t("catalogReadmeTruncated")) : null,
-            readme && entry.repository
+            entry.repository
               ? h("a", { className: "dmm-link", href: entry.repository, target: "_blank", rel: "noreferrer noopener" }, t("catalogViewOnGitHub"))
               : null)
         : null,
