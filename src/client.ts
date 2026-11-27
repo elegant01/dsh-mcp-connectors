@@ -1308,8 +1308,9 @@ function CatalogModal(props: {
   }, [t]);
 
   const [reach, setReach] = useState<Reachability | null>(null);
-  const registryAvailable = reach?.registry !== false;
-  const mcpsoAvailable = reach?.mcpso !== false;
+  // 探测结果回来之前按不可用处理：宁可晚出现，也不先渲染再隐藏
+  const registryAvailable = reach?.registry === true;
+  const mcpsoAvailable = reach?.mcpso === true;
 
   useEffect(() => {
     let alive = true;
@@ -1699,6 +1700,7 @@ function CatalogModal(props: {
       h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))),
     h("div", { className: "dmm-modal-body" },
       h("div", { className: "dmm-catalog-subtitle" }, t("catalogSubtitle")),
+      !reach ? h("div", { key: "probe" }, skeletonList(t("catalogLoading"))) : null,
       reach && (!reach.registry || !reach.mcpso)
         ? h("div", { className: "dmm-field-hint", style: { marginBottom: 6 } }, t("catalogOfflineHidden"))
         : null,

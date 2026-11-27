@@ -152,6 +152,9 @@ export function apply(ctx: HostContext) {
 
   const API_PREFIX = "/api/dsh-mcp-connectors";
 
+  // 插件加载即预热可达性探测，弹层打开时直接命中缓存，避免 Tab 先渲染再隐藏
+  void checkReachability().catch(() => undefined);
+
   const handlePost = (
     req: Request,
     action: (body: Record<string, unknown>) => Promise<unknown>,
