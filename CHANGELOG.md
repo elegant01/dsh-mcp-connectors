@@ -2,6 +2,21 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/), versions use [SemVer](https://semver.org/).
 
+## [0.4.0] - 2026-11-27
+
+### Added
+
+- New "TraeWork MCP market" source: reads the public API behind the marketplace built into TRAE SOLO CN (475 entries; 318 with a run command are installable, 157 are browse-only introductions). Supports filtering, details (README / repository / run command / parameters) and one-click install into any agent; 30-minute cache with a local snapshot fallback when offline. READMEs are fetched only from the marketplace's own download URL.
+- Opening the connector catalog now probes reachability: when the official MCP Registry or mcp.so is unreachable, the "Online discovery" and "mcp.so" tabs are hidden and the panel switches to a source that still works (WorkBuddy connectors first).
+
+### Changed
+
+- Connector catalog tab order is now: Online discovery, mcp.so, WorkBuddy connectors, Qoder, TraeWork.
+
+### Fixed
+
+- Browse-only entries no longer mislabel themselves as "CLI (WorkBuddy only)"; they now show "Browse only".
+
 ## [0.3.1] - 2026-11-26
 
 ### Fixed

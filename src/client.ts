@@ -126,7 +126,7 @@ export const ZH: Dict = {
   backToTop: "回到顶部",
   discover: "发现连接器",
   catalogTitle: "发现连接器",
-  catalogSubtitle: "从 MCP Registry、mcp.so、Qoder 或 WorkBuddy 市场发现连接器，选中 Agent 后一键安装",
+  catalogSubtitle: "从 MCP Registry、mcp.so、Qoder、TraeWork 或 WorkBuddy 市场发现连接器，选中 Agent 后一键安装",
   catalogOfficial: "官方参考",
   catalogRegistry: "在线发现",
   catalogSearchPlaceholder: "搜索 MCP Registry（名称 / 描述）…",
@@ -165,7 +165,7 @@ export const ZH: Dict = {
   catalogReadme: "README",
   catalogReadmeLoading: "正在读取仓库 README…",
   catalogReadmeFailed: "README 读取失败",
-  catalogReadmeTruncated: "README 过长，仅显示前 600 行；完整内容请到 GitHub 查看。",
+  catalogReadmeTruncated: "README 过长，仅显示前 600 行；完整内容请查看原文。",
   catalogViewOnGitHub: "在 GitHub 查看",
   catalogLoadMore: "加载更多",
   catalogLoaded: "已加载",
@@ -191,6 +191,12 @@ export const ZH: Dict = {
   catalogQoderStale: "当前无法访问 Qoder 市场，显示的是上次成功抓取的缓存。",
   catalogQoderDetailLoading: "正在读取连接器详情…",
   catalogQoderDetailFailed: "Qoder 连接器详情读取失败",
+  catalogTrae: "TraeWork MCP 市场",
+  catalogTraeHint: "读取 TraeWork 内置的 MCP 市场（公开接口，收录数百个可安装的 stdio 服务器），可一键安装到任意 Agent。",
+  catalogTraeLoading: "正在读取 TraeWork MCP 市场…",
+  catalogTraeFailed: "TraeWork MCP 市场读取失败",
+  catalogTraeStale: "当前无法访问 TraeWork 市场，显示的是上次成功抓取的缓存。",
+  catalogOfflineHidden: "当前访问不了外网，已隐藏「在线发现」和「mcp.so 热门」两个来源。",
   catalogBrowseOnly: "仅浏览",
   catalogInstallable: "可安装",
   catalogCliOnly: "CLI（仅 WorkBuddy）",
@@ -293,7 +299,7 @@ const EN: Dict = {
   backToTop: "Back to top",
   discover: "Discover connectors",
   catalogTitle: "Discover connectors",
-  catalogSubtitle: "Find connectors on MCP Registry, mcp.so, the Qoder marketplace or WorkBuddy, then install into the selected agents",
+  catalogSubtitle: "Find connectors on MCP Registry, mcp.so, the Qoder or TraeWork marketplaces or WorkBuddy, then install into the selected agents",
   catalogOfficial: "Official reference",
   catalogRegistry: "Online",
   catalogSearchPlaceholder: "Search MCP Registry (name / description)…",
@@ -332,7 +338,7 @@ const EN: Dict = {
   catalogReadme: "README",
   catalogReadmeLoading: "Loading repository README…",
   catalogReadmeFailed: "Failed to load README",
-  catalogReadmeTruncated: "README is long; only the first 600 lines are shown. View the full file on GitHub.",
+  catalogReadmeTruncated: "README is long; only the first 600 lines are shown. Open the source for the full file.",
   catalogViewOnGitHub: "View on GitHub",
   catalogLoadMore: "Load more",
   catalogLoaded: "Loaded",
@@ -358,6 +364,12 @@ const EN: Dict = {
   catalogQoderStale: "The Qoder marketplace is unreachable; showing the last successful snapshot.",
   catalogQoderDetailLoading: "Loading connector details…",
   catalogQoderDetailFailed: "Failed to load Qoder connector details",
+  catalogTrae: "TraeWork MCP market",
+  catalogTraeHint: "Reads the MCP marketplace built into TraeWork (public API, hundreds of installable stdio servers) and installs into any agent.",
+  catalogTraeLoading: "Loading the TraeWork MCP market…",
+  catalogTraeFailed: "Failed to load the TraeWork MCP market",
+  catalogTraeStale: "The TraeWork marketplace is unreachable; showing the last successful snapshot.",
+  catalogOfflineHidden: "The internet is unreachable, so the Online discovery and mcp.so tabs are hidden.",
   catalogBrowseOnly: "Browse only",
   catalogInstallable: "Installable",
   catalogCliOnly: "CLI (WorkBuddy only)",
@@ -678,6 +690,10 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
     [sources],
   );
 
+  /** DSH 组恒排第一（内置 mcp.json 为空时会被过滤，只剩 profile 来源，位置掉到最后）；其余按出现顺序（稳定排序）。 */
+  const sortGroups = <T extends { key: string }>(list: T[]): T[] =>
+    [...list].sort((a, b) => (a.key === "dsh" ? 0 : 1) - (b.key === "dsh" ? 0 : 1));
+
   /** 产品归组：同 group 的多个配置文件合成一张卡片。 */
   const groups = useMemo(() => {
     const map = new Map<string, { key: string; label: string; sources: SourceView[] }>();
@@ -690,7 +706,7 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
       }
       group.sources.push(source);
     }
-    return [...map.values()];
+    return sortGroups([...map.values()]);
   }, [sources]);
 
   const allServers = useMemo(() => {
@@ -743,7 +759,7 @@ export function McpManagerApp(props: { t: (k: string) => string }) {
       };
       group.servers.sort((a, b) => indexOf(a) - indexOf(b));
     }
-    return [...map.values()];
+    return sortGroups([...map.values()]);
   }, [allServers, snapshot]);
 
   // ---------- 渲染 ----------
@@ -1199,11 +1215,13 @@ function CatalogModal(props: {
 }) {
   const { t, sources, refresh, toast, close } = props;
   const isZh = t("title") === ZH.title;
-  type Tab = "registry" | "mcpso" | "qoder" | "workbuddy";
+  type Tab = "registry" | "mcpso" | "qoder" | "trae" | "workbuddy";
   interface RankingsPayload { items: RankingEntry[]; fetchedAt: string; stale: boolean; source: string; error?: string }
   interface WorkBuddyStatus { available: boolean; count: number; installable: number }
   interface WorkBuddyCatalog extends WorkBuddyStatus { items: CatalogEntry[]; fetchedAt: string }
   interface QoderCatalogPayload { items: CatalogEntry[]; fetchedAt: string; stale: boolean; source: string; error?: string }
+  interface TraeCatalogPayload { items: CatalogEntry[]; fetchedAt: string; stale: boolean; source: string; error?: string }
+  interface Reachability { registry: boolean; mcpso: boolean; checkedAt: string }
 
   const [tab, setTab] = useState<Tab>("registry");
   const [query, setQuery] = useState("");
@@ -1231,6 +1249,10 @@ function CatalogModal(props: {
   const [qError, setQError] = useState<string | null>(null);
   const [qQuery, setQQuery] = useState("");
   const [qDetailLoading, setQDetailLoading] = useState<string | null>(null);
+  const [trae, setTrae] = useState<TraeCatalogPayload | null>(null);
+  const [trLoading, setTrLoading] = useState(false);
+  const [trError, setTrError] = useState<string | null>(null);
+  const [trQuery, setTrQuery] = useState("");
   const [rankDetailLoading, setRankDetailLoading] = useState<string | null>(null);
   interface RankingDetailPayload {
     id: string; url: string; title?: string; description?: string; repository?: string;
@@ -1261,9 +1283,22 @@ function CatalogModal(props: {
     }
   }, [t]);
 
+  const [reach, setReach] = useState<Reachability | null>(null);
+  const registryAvailable = reach?.registry !== false;
+  const mcpsoAvailable = reach?.mcpso !== false;
+
   useEffect(() => {
-    if (tab === "registry" && !searched && !loading) void runSearch("");
-  }, [tab, searched, loading, runSearch]);
+    let alive = true;
+    callApi<Reachability>("/catalog/reachability")
+      .then((status) => { if (alive) setReach(status); })
+      // 探测接口本身失败时按「可用」处理，避免误隐藏
+      .catch(() => { if (alive) setReach({ registry: true, mcpso: true, checkedAt: "" }); });
+    return () => { alive = false; };
+  }, []);
+
+  useEffect(() => {
+    if (tab === "registry" && registryAvailable && !searched && !loading) void runSearch("");
+  }, [tab, registryAvailable, searched, loading, runSearch]);
 
   // WorkBuddy 没装时来源目录不存在，面板里直接不出现这个 Tab
   useEffect(() => {
@@ -1273,6 +1308,13 @@ function CatalogModal(props: {
       .catch(() => { if (alive) setWbStatus({ available: false, count: 0, installable: 0 }); });
     return () => { alive = false; };
   }, []);
+
+  // 当前 Tab 断网被隐藏后，自动切到还能用的来源
+  useEffect(() => {
+    if (!reach) return;
+    if (tab === "registry" && !reach.registry) setTab(wbStatus?.available ? "workbuddy" : "trae");
+    else if (tab === "mcpso" && !reach.mcpso) setTab(wbStatus?.available ? "workbuddy" : "trae");
+  }, [reach, tab, wbStatus]);
 
   const loadRankings = useCallback(async () => {
     setRankLoading(true);
@@ -1299,8 +1341,8 @@ function CatalogModal(props: {
   }, [t]);
 
   useEffect(() => {
-    if (tab === "mcpso" && !rankings && !rankLoading && !rankError) void loadRankings();
-  }, [tab, rankings, rankLoading, rankError, loadRankings]);
+    if (tab === "mcpso" && mcpsoAvailable && !rankings && !rankLoading && !rankError) void loadRankings();
+  }, [tab, mcpsoAvailable, rankings, rankLoading, rankError, loadRankings]);
 
   useEffect(() => {
     if (tab === "workbuddy" && wbStatus?.available && !workbuddy && !wbLoading && !wbError) void loadWorkbuddy();
@@ -1321,6 +1363,22 @@ function CatalogModal(props: {
   useEffect(() => {
     if (tab === "qoder" && !qoder && !qLoading && !qError) void loadQoder();
   }, [tab, qoder, qLoading, qError, loadQoder]);
+
+  const loadTrae = useCallback(async () => {
+    setTrLoading(true);
+    setTrError(null);
+    try {
+      setTrae(await callApi<TraeCatalogPayload>("/catalog/trae"));
+    } catch (caught) {
+      setTrError(`${t("catalogTraeFailed")}: ${caught instanceof Error ? caught.message : String(caught)}`);
+    } finally {
+      setTrLoading(false);
+    }
+  }, [t]);
+
+  useEffect(() => {
+    if (tab === "trae" && !trae && !trLoading && !trError) void loadTrae();
+  }, [tab, trae, trLoading, trError, loadTrae]);
 
   // Qoder 市场条目的安装配置在详情接口里；点「详情/安装」时按需抓取后再决定能否直接写回
   const openQoderDetail = useCallback(async (item: CatalogEntry, mode: "detail" | "install") => {
@@ -1485,9 +1543,11 @@ function CatalogModal(props: {
                 ? h("span", { className: "dmm-tag accent" }, t("catalogMcpso"))
                 : entry.source === "qoder"
                   ? h("span", { className: "dmm-tag purple" }, t("catalogQoder"))
-                  : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
+                  : entry.source === "trae"
+                    ? h("span", { className: "dmm-tag cyan" }, t("catalogTrae"))
+                    : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
           entry.installable === false
-            ? h("span", { className: "dmm-tag yellow" }, entry.source === "qoder" ? t("catalogBrowseOnly") : t("catalogCliOnly"))
+            ? h("span", { className: "dmm-tag yellow" }, entry.source === "workbuddy" ? t("catalogCliOnly") : t("catalogBrowseOnly"))
             : null,
           installed.length ? h("span", { className: "dmm-tag green" }, `${t("catalogInstalled")} ${installed.length}`) : null),
         h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
@@ -1580,6 +1640,10 @@ function CatalogModal(props: {
   const qList = (qoder?.items ?? []).filter((item) =>
     !qFilter || `${item.title} ${item.titleEn ?? ""} ${item.description} ${item.descriptionZh ?? ""} ${(item.tags ?? []).join(" ")}`
       .toLowerCase().includes(qFilter));
+  const trFilter = trQuery.trim().toLowerCase();
+  const trList = (trae?.items ?? []).filter((item) =>
+    !trFilter || `${item.title} ${item.titleEn ?? ""} ${item.description} ${item.packageId ?? ""} ${(item.tags ?? []).join(" ")}`
+      .toLowerCase().includes(trFilter));
 
   const tabButton = (key: Tab, label: string) =>
     h("button", { key, "aria-selected": tab === key, onClick: () => setTab(key) }, label);
@@ -1588,28 +1652,34 @@ function CatalogModal(props: {
     tab === "registry" ? "MCP Registry"
       : tab === "mcpso" ? "mcp.so"
         : tab === "qoder" ? "Qoder"
-          : "WorkBuddy";
+          : tab === "trae" ? "TraeWork"
+            : "WorkBuddy";
 
   // 断网兜底：在线来源都失败且本机没有 WorkBuddy 时，才露出内置的 7 个参考实现
   const showOfflineFallback = !wbStatus?.available && (
     (tab === "registry" && Boolean(error) && registryList.length === 0) ||
     (tab === "mcpso" && Boolean(rankError) && !(rankings?.items?.length)) ||
-    (tab === "qoder" && Boolean(qError) && !(qoder?.items?.length))
+    (tab === "qoder" && Boolean(qError) && !(qoder?.items?.length)) ||
+    (tab === "trae" && Boolean(trError) && !(trae?.items?.length))
   );
 
   return h(ModalShell, { onClose: close, wide: true, fixedHeight: true },
     h("div", { className: "dmm-modal-head" },
       h("div", { className: "dmm-modal-title" }, t("catalogTitle")),
       h("div", { className: "dmm-segmented" },
-        tabButton("registry", t("catalogRegistry")),
-        tabButton("mcpso", t("catalogMcpso")),
+        registryAvailable ? tabButton("registry", t("catalogRegistry")) : null,
+        mcpsoAvailable ? tabButton("mcpso", t("catalogMcpso")) : null,
+        wbStatus?.available ? tabButton("workbuddy", t("catalogWorkbuddy")) : null,
         tabButton("qoder", t("catalogQoder")),
-        wbStatus?.available ? tabButton("workbuddy", t("catalogWorkbuddy")) : null),
+        tabButton("trae", t("catalogTrae"))),
       h("button", { className: "dmm-close", onClick: close }, icon(ICONS.close))),
     h("div", { className: "dmm-modal-body" },
       h("div", { className: "dmm-catalog-subtitle" }, t("catalogSubtitle")),
+      reach && (!reach.registry || !reach.mcpso)
+        ? h("div", { className: "dmm-field-hint", style: { marginBottom: 6 } }, t("catalogOfflineHidden"))
+        : null,
 
-      tab === "registry" ? [
+      tab === "registry" && registryAvailable ? [
         h("div", { className: "dmm-catalog-search", key: "search" },
           h("input", {
             className: "dmm-input", value: query, placeholder: t("catalogSearchPlaceholder"),
@@ -1638,7 +1708,7 @@ function CatalogModal(props: {
           : null,
       ] : null,
 
-      tab === "mcpso" ? [
+      tab === "mcpso" && mcpsoAvailable ? [
         h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogMcpsoHint")),
         h("div", { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
           h("input", {
@@ -1690,6 +1760,31 @@ function CatalogModal(props: {
           onInstall: () => void openQoderDetail(entry, "install"),
         }))),
         qoder && !qList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
+      ] : null,
+
+      tab === "trae" ? [
+        h("div", { className: "dmm-field-hint", key: "hint" }, t("catalogTraeHint")),
+        trae && !trae.stale
+          ? h("div", { className: "dmm-field-hint", key: "summary" },
+              `${trae.items.length} ${t("catalogConnectorsUnit")} · ${new Date(trae.fetchedAt).toLocaleString()}`)
+          : null,
+        trae?.stale
+          ? h("div", { className: "dmm-warn", key: "stale" },
+              `${t("catalogTraeStale")}${trae.error ? `（${trae.error}）` : ""} · ${new Date(trae.fetchedAt).toLocaleString()}`)
+          : null,
+        h("div", { className: "dmm-catalog-search", key: "filter", style: { marginTop: 8 } },
+          h("input", {
+            className: "dmm-input", value: trQuery, placeholder: `${t("catalogFilter")}…`,
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setTrQuery(e.target.value),
+          })),
+        trLoading && !trae ? h("div", { key: "loading" }, skeletonList(t("catalogTraeLoading"))) : null,
+        trError && !trae
+          ? h("div", { key: "error" },
+              h("div", { className: "dmm-warn" }, trError),
+              h("button", { className: "dmm-btn dmm-btn-secondary dmm-btn-sm", style: { marginTop: 6 }, onClick: () => void loadTrae() }, t("catalogRetry")))
+          : null,
+        h("div", { className: "dmm-catalog-list", key: "list" }, trList.map((entry) => card(entry))),
+        trae && !trList.length ? h("div", { className: "dmm-empty", key: "nores" }, t("catalogNoResults")) : null,
       ] : null,
 
       tab === "workbuddy" ? [
@@ -1812,19 +1907,24 @@ function CatalogDetailView(props: {
   close: () => void;
 }) {
   const { entry, t, isZh, installed, onBack, onInstall, close } = props;
+  const readmeRequest = entry.source === "trae" && entry.remoteId
+    ? `/catalog/trae/readme?id=${encodeURIComponent(entry.remoteId)}`
+    : entry.repository
+      ? `/catalog/readme?repo=${encodeURIComponent(entry.repository)}`
+      : null;
   const [readme, setReadme] = useState<{ text: string; url: string; truncated: boolean } | null>(null);
   const [readmeError, setReadmeError] = useState<string | null>(null);
-  const [readmeLoading, setReadmeLoading] = useState(Boolean(entry.repository));
+  const [readmeLoading, setReadmeLoading] = useState(Boolean(readmeRequest));
   const [readmeNonce, setReadmeNonce] = useState(0);
 
   useEffect(() => {
     let alive = true;
-    if (!entry.repository) {
+    if (!readmeRequest) {
       setReadmeLoading(false);
       return;
     }
     setReadmeLoading(true);
-    callApi<{ text: string; url: string; truncated: boolean }>(`/catalog/readme?repo=${encodeURIComponent(entry.repository)}`)
+    callApi<{ text: string; url: string; truncated: boolean }>(readmeRequest)
       .then((data) => {
         if (!alive) return;
         setReadme(data);
@@ -1837,7 +1937,7 @@ function CatalogDetailView(props: {
         if (alive) setReadmeLoading(false);
       });
     return () => { alive = false; };
-  }, [entry.repository, readmeNonce]);
+  }, [readmeRequest, readmeNonce]);
 
   const fieldLabel = (field: CatalogField) => (isZh ? field.label : field.labelEn ?? field.label);
   const examples = (isZh ? entry.examples ?? entry.examplesEn : entry.examplesEn ?? entry.examples) ?? [];
@@ -1871,9 +1971,11 @@ function CatalogDetailView(props: {
               ? h("span", { className: "dmm-tag accent" }, t("catalogMcpso"))
               : entry.source === "qoder"
                 ? h("span", { className: "dmm-tag purple" }, t("catalogQoder"))
-                : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
+                : entry.source === "trae"
+                  ? h("span", { className: "dmm-tag cyan" }, t("catalogTrae"))
+                  : h("span", { className: "dmm-tag purple" }, t("catalogWorkbuddy")),
         entry.installable === false
-          ? h("span", { className: "dmm-tag yellow" }, entry.source === "qoder" ? t("catalogBrowseOnly") : t("catalogCliOnly"))
+          ? h("span", { className: "dmm-tag yellow" }, entry.source === "workbuddy" ? t("catalogCliOnly") : t("catalogBrowseOnly"))
           : null,
         ...(entry.tags ?? []).map((tag) => h("span", { className: "dmm-tag gray", key: tag }, tag))),
       h("div", { className: "dmm-catalog-desc" }, isZh ? (entry.descriptionZh ?? entry.description) : entry.description),
@@ -1903,8 +2005,8 @@ function CatalogDetailView(props: {
                 ? renderMarkdown(readme.text)
                 : h("div", { className: "dmm-readme" },
                     h("div", { className: "dmm-field-hint" },
-                      entry.repository ? `${t("catalogReadmeFailed")}: ${readmeError ?? ""}` : t("catalogNoRepo")),
-                    entry.repository && readmeError
+                      readmeRequest ? `${t("catalogReadmeFailed")}: ${readmeError ?? ""}` : t("catalogNoRepo")),
+                    readmeRequest && readmeError
                       ? h("button", {
                           className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
                           style: { marginTop: 8 },

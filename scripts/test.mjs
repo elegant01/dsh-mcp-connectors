@@ -186,6 +186,7 @@ const host = await import("../lib/index.js");
 const mcpso = await import("../lib/mcpso.js");
 const workbuddy = await import("../lib/workbuddy.js");
 const qoder = await import("../lib/qoder.js");
+const trae = await import("../lib/trae.js");
 const discover = await import("../lib/discover.js");
 const log = async () => {};
 
@@ -467,6 +468,9 @@ await test("host 路由：catalog install/uninstall 走写接口门禁", async (
   assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/workbuddy/icon"));
   assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/qoder"));
   assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/qoder/detail"));
+  assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/trae"));
+  assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/trae/readme"));
+  assert.ok(routes.get("/api/dsh-mcp-connectors/catalog/reachability"));
 
   const makeRequest = (path, body, headers = {}) => new Request(`http://localhost${path}`, {
     method: "POST",
@@ -746,6 +750,111 @@ await test("写回 Qoder CN settings.json：保留插件 / providers / 原有服
   assert.equal(after.mcpServers.xmind, undefined);
   assert.ok(after.mcpServers.existing);
   assert.deepEqual(after.enabledPlugins, { "demo@qoder-marketplace": true });
+});
+
+console.log("\n[TraeWork MCP 市场]");
+await test("目录映射：env 配置转字段、图标 / 仓库 / 包名保留", () => {
+  const entry = trae.mapTraeItem({
+    id: "byted-mcp-volcengine.gezhe_ppt_mcp",
+    displayName: "歌者PPT",
+    description: "歌者 PPT MCP server，可以通过话题生成 PPT。",
+    icon: "https://eps-common-public.tos-cn-beijing.volces.com/logo.png",
+    categories: ["内容生成"],
+    repository: "https://www.volcengine.com/ats/mcp_detail?name=x",
+    provider: { displayTextKey: "third_party" },
+    commands: {
+      universal: {
+        run: [{
+          command: "npx",
+          args: ["-y", "gezhe-mcp-server@latest"],
+          configs: [{
+            title: "API_KEY", placeholder: "API_KEY", required: true, key: "API_KEY",
+            type: "env", description: "YOUR_APP_KEY", isPassword: true,
+          }],
+          mcp_server_type: "stdio",
+        }],
+      },
+    },
+  });
+  assert.equal(entry.source, "trae");
+  assert.equal(entry.remoteId, "byted-mcp-volcengine.gezhe_ppt_mcp");
+  assert.equal(entry.transport, "stdio");
+  assert.equal(entry.packageId, "gezhe-mcp-server");
+  assert.deepEqual(entry.args, ["-y", "gezhe-mcp-server@latest"]);
+  assert.deepEqual(entry.env, { API_KEY: "{{API_KEY}}" });
+  assert.equal(entry.fields[0].secret, true);
+  assert.equal(entry.fields[0].required, true);
+  assert.ok(entry.iconUrl.startsWith("https://"));
+  assert.ok(entry.warning.includes("TraeWork"));
+  const spec = catalog.expandCatalogSpec(entry, { API_KEY: "sk-1" });
+  assert.deepEqual(spec.env, { API_KEY: "sk-1" });
+});
+
+await test("目录映射：args 配置接在 --flag 后或作为位置参数", () => {
+  const flag = trae.mapTraeItem({
+    id: "byted-mcp-volcengine.sqlite",
+    displayName: "SQLite",
+    commands: { universal: { run: [{
+      command: "uvx",
+      args: ["mcp-server-sqlite", "--db-path"],
+      configs: [{ title: "db_path", key: "", type: "args", required: true, description: "SQLite Database Path" }],
+    }] } },
+  });
+  assert.deepEqual(flag.args, ["mcp-server-sqlite", "--db-path", "{{db_path}}"]);
+  assert.deepEqual(catalog.expandCatalogSpec(flag, { db_path: "F:/a.db" }).args,
+    ["mcp-server-sqlite", "--db-path", "F:/a.db"]);
+
+  const positional = trae.mapTraeItem({
+    id: "byted-mcp-volcengine.postgresql",
+    displayName: "PostgreSQL",
+    commands: { universal: { run: [{
+      command: "npx",
+      args: ["-y", "@modelcontextprotocol/server-postgres"],
+      configs: [{ title: "pg_url", key: "pg_url", type: "args", required: true }],
+    }] } },
+  });
+  assert.deepEqual(positional.args, ["-y", "@modelcontextprotocol/server-postgres", "{{pg_url}}"]);
+  assert.deepEqual(catalog.expandCatalogSpec(positional, { pg_url: "postgresql://x" }).args,
+    ["-y", "@modelcontextprotocol/server-postgres", "postgresql://x"]);
+  // 必填字段留空时，位置参数整段省略，而不是写个空串
+  assert.deepEqual(catalog.expandCatalogSpec(positional, {}).args,
+    ["-y", "@modelcontextprotocol/server-postgres"]);
+});
+
+await test("目录映射：没有启动命令的条目保留为仅浏览", () => {
+  assert.equal(trae.mapTraeItem({ id: "x.y", displayName: "X", commands: { universal: { run: [{ command: "npx" }] } } })?.command, "npx");
+  assert.equal(trae.mapTraeItem({ displayName: "X", commands: { universal: { run: [{ command: "npx" }] } } }), null);
+  const browse = trae.mapTraeItem({
+    id: "byted-mcp.ida-pro-mcp",
+    displayName: "IDA Pro MCP",
+    description: "Reverse engineering assistant.",
+    commands: { universal: {} },
+    repository: "https://github.com/mrexodia/ida-pro-mcp",
+  });
+  assert.equal(browse.installable, false);
+  assert.equal(browse.remoteId, "byted-mcp.ida-pro-mcp");
+  assert.ok(browse.warning.includes("没有可直接运行的命令"));
+  assert.equal(browse.repository, "https://github.com/mrexodia/ida-pro-mcp");
+});
+
+await test("目录映射：按平台挑运行配置", () => {
+  const darwinOnly = trae.mapTraeItem({
+    id: "recursechat.mcp-server-apple-shortcuts",
+    displayName: "Apple Shortcuts",
+    commands: { darwin: { run: [{ command: "npx", args: ["-y", "mcp-server-apple-shortcuts"] }] } },
+  });
+  assert.equal(darwinOnly.command, "npx");
+  if (process.platform !== "darwin") assert.ok(darwinOnly.warning.includes("darwin"));
+
+  const universal = trae.mapTraeItem({
+    id: "a.b",
+    displayName: "B",
+    commands: {
+      darwin: { run: [{ command: "npx", args: ["-y", "mac-only"] }] },
+      universal: { run: [{ command: "npx", args: ["-y", "anywhere"] }] },
+    },
+  });
+  assert.deepEqual(universal.args, ["-y", "anywhere"]);
 });
 
 console.log("\n[扫描]");

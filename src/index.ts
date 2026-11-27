@@ -26,6 +26,8 @@ import { fetchGitHubReadme, searchRegistry } from "./registry.js";
 import { fetchRankingDetail, fetchRankings } from "./mcpso.js";
 import { findWorkBuddyIcon, loadWorkBuddyCatalog, workbuddyStatus } from "./workbuddy.js";
 import { fetchQoderDetail, loadQoderCatalog } from "./qoder.js";
+import { fetchTraeReadme, loadTraeCatalog } from "./trae.js";
+import { checkReachability } from "./reachability.js";
 import { join } from "node:path";
 
 interface HostContext {
@@ -186,6 +188,12 @@ export function apply(ctx: HostContext) {
       }),
     },
     {
+      // 只读：目录来源可达性（断外网时前端隐藏「在线发现」「mcp.so 热门」Tab）
+      path: `${API_PREFIX}/catalog/reachability`,
+      methods: ["GET"],
+      fetch: () => runFetch(() => checkReachability()),
+    },
+    {
       // 只读：按需抓取仓库 README（只允许 github.com，固定转到 raw.githubusercontent.com）
       path: `${API_PREFIX}/catalog/readme`,
       methods: ["GET"],
@@ -274,6 +282,28 @@ export function apply(ctx: HostContext) {
           throw error;
         }
         return fetchQoderDetail(id);
+      }),
+    },
+    {
+      // 只读：TraeWork 内置 MCP 市场目录（公开接口 + 30 分钟缓存 + 断网快照）
+      path: `${API_PREFIX}/catalog/trae`,
+      methods: ["GET"],
+      fetch: () => runFetch(() => loadTraeCatalog()),
+    },
+    {
+      // 只读：TraeWork 市场条目 README（只允许市场自己的 direct-download 地址）
+      path: `${API_PREFIX}/catalog/trae/readme`,
+      methods: ["GET"],
+      fetch: (req: Request) => runFetch(async () => {
+        let id = "";
+        try { id = new URL(req.url).searchParams.get("id") ?? ""; } catch { /* 缺少参数 */ }
+        if (!id) {
+          const error: CodedError = new Error("缺少 id 参数");
+          error.statusCode = 400;
+          error.code = "error.catalog.traeId";
+          throw error;
+        }
+        return fetchTraeReadme(id);
       }),
     },
     {

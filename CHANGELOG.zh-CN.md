@@ -2,6 +2,21 @@
 
 本项目的重要变更都记录在此。格式遵循 [Keep a Changelog](https://keepachangelog.com/)，版本号遵循 [SemVer](https://semver.org/)。
 
+## [0.4.0] - 2026-11-27
+
+### 新增
+
+- 新增「TraeWork MCP 市场」来源：读取 TRAE SOLO CN 内置市场的公开接口（475 个条目，其中 318 个提供启动命令、可直接安装，157 个只有介绍、标为「仅浏览」）。支持筛选、详情（README / 仓库 / 启动命令 / 参数）与一键安装到任意 Agent；30 分钟缓存，断网时回退本地快照。README 只允许抓取市场自己的下载地址。
+- 打开连接器目录时会探测外网：访问不了官方 MCP Registry 或 mcp.so 时，隐藏「在线发现」「mcp.so 热门」两个 Tab，并自动切到还能用的来源（优先 WorkBuddy 连接器）。
+
+### 变更
+
+- 连接器目录的 Tab 顺序调整为：在线发现、mcp.so 热门、WorkBuddy 连接器、Qoder、TraeWork。
+
+### 修复
+
+- 只能浏览的条目不再误显示「CLI（仅 WorkBuddy）」，统一显示「仅浏览」。
+
 ## [0.3.1] - 2026-11-26
 
 ### 修复

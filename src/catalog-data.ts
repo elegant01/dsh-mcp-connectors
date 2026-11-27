@@ -24,8 +24,8 @@ export interface CatalogEntry {
   titleEn?: string;
   description: string;
   descriptionZh?: string;
-  /** official = modelcontextprotocol/servers；registry = MCP Registry；mcpso = mcp.so 详情页；qoder = Qoder 官方市场；workbuddy = 本机 WorkBuddy 市场 */
-  source: "official" | "registry" | "mcpso" | "qoder" | "workbuddy";
+  /** official = modelcontextprotocol/servers；registry = MCP Registry；mcpso = mcp.so 详情页；qoder = Qoder 官方市场；trae = TraeWork 内置 MCP 市场；workbuddy = 本机 WorkBuddy 市场 */
+  source: "official" | "registry" | "mcpso" | "qoder" | "trae" | "workbuddy";
   /** 来源侧的原始 id（Qoder 的 connector_id；安装名另用 slug） */
   remoteId?: string;
   transport: "stdio" | "http";
