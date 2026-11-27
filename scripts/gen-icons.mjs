@@ -38,7 +38,11 @@ const MAP = {
 // 兜底:roo / ccswitch / 自定义来源用通用插头图标(currentColor,手绘)
 const FALLBACK = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 1.5v3M10 1.5v3M4 4.5h8v3a4 4 0 0 1-8 0v-3zM8 11.5v3"/></svg>`;
 
-function normalize(svg) {
+function normalize(svg, key) {
+  if (key === "dsh") {
+    // 内联 <style> 是全局 CSS,dark 下会把整页所有 path 刷成白色,改用 currentColor 跟随主题
+    svg = svg.replace(/<style>[\s\S]*?<\/style>/, "").replace(/fill="#000"/, 'fill="currentColor"');
+  }
   return svg
     .replace(/<\?xml[^>]*\?>/g, "")
     .replace(/<!--[\s\S]*?-->/g, "")
@@ -58,7 +62,7 @@ const out = [
 ];
 for (const [key, file] of Object.entries(MAP)) {
   const raw = await readFile(join(VENDOR, file), "utf8");
-  out.push(`  ${JSON.stringify(key)}: ${JSON.stringify(normalize(raw))},`);
+  out.push(`  ${JSON.stringify(key)}: ${JSON.stringify(normalize(raw, key))},`);
 }
 out.push(`  fallback: ${JSON.stringify(normalize(FALLBACK))},`);
 out.push("};");
