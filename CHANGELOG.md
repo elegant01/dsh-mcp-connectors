@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/), versions use [SemVer](https://semver.org/).
 
+## [1.0.1] - 2026-11-27
+
+### Added
+
+- New connector shortcut in the composer toolbar (next to the ＋ button): a plug icon with a count badge of enabled connectors; hover or click opens a management popover that toggles DSH's own MCP connectors, writing straight to the config.
+- The popover supports searching by name/command and keyboard control (↑↓ to move, Enter to toggle); the list caps at four rows and scrolls internally, using DSH's themed thin scrollbar.
+- The popover footer adds "Discover connectors" (opens the connector catalog in place; the list and badge refresh after install) and "Open settings" (opens settings focused on the Connectors section).
+
+### Changed
+
+- Added `npm run deploy`: syncs local build output into the DSH profile in place (without touching the profile's version pin) for local development.
+
 ## [0.4.0] - 2026-11-27
 
 ### Added
