@@ -3,7 +3,8 @@
 // 纯 React.createElement，无 JSX 依赖；样式全部来自 board-css.ts 的 .dmm 作用域。
 
 import * as React from "react";
-import { BOARD_CSS } from "./board-css.js";
+import { createPortal } from "react-dom";
+import { BOARD_CSS, PICKER_CSS } from "./board-css.js";
 import { AGENT_ICONS } from "./agent-icons.js";
 import {
   OFFICIAL_CATALOG, matchesCatalogEntry, expandCatalogSpec,
@@ -34,9 +35,14 @@ interface Snapshot {
 interface SlotsService {
   register(meta: Record<string, unknown>, component?: unknown): (() => void) | unknown;
   inject(name: string, declareFn: () => unknown): (() => void) | unknown;
+  entries?(key: string): readonly unknown[];
 }
 interface LocaleService { bind(ns: string): (key: string, params?: Record<string, unknown>) => string; }
-interface ClientContext { slots?: SlotsService; locale?: LocaleService; }
+interface ClientContext {
+  slots?: SlotsService;
+  locale?: LocaleService;
+  get?: (name: string) => unknown;
+}
 
 // ---------- 词典 ----------
 type Dict = Record<string, string>;
@@ -212,6 +218,15 @@ export const ZH: Dict = {
   catalogRankDetailLoading: "正在读取 mcp.so 详情…",
   catalogRankDetailFailed: "mcp.so 详情读取失败",
   catalogRankNoConfig: "该条目在 mcp.so 详情页没有可用的安装配置，只能跳转查看。",
+  pickerTitle: "DSH 连接器",
+  pickerHint: "开关会直接写入 DSH 的 MCP 配置文件",
+  pickerEmpty: "DSH 还没有配置连接器，去「设置 › 连接器」添加。",
+  pickerLoading: "正在读取连接器…",
+  pickerFailed: "读取失败",
+  pickerOpenSettings: "前往设置页",
+  pickerSearch: "搜索连接器…",
+  pickerNoMatch: "没有匹配的连接器",
+  pickerDiscover: "发现新连接器",
 };
 const EN: Dict = {
   title: "Connectors",
@@ -385,6 +400,15 @@ const EN: Dict = {
   catalogRankDetailLoading: "Loading mcp.so details…",
   catalogRankDetailFailed: "Failed to load mcp.so details",
   catalogRankNoConfig: "No install configuration was found on this mcp.so page; it is browse-only.",
+  pickerTitle: "DSH connectors",
+  pickerHint: "Toggles are written straight into DSH's MCP config file",
+  pickerEmpty: "No connectors configured for DSH yet — add one under Settings › Connectors.",
+  pickerLoading: "Reading connectors…",
+  pickerFailed: "Failed to load",
+  pickerOpenSettings: "Open settings",
+  pickerSearch: "Search connectors…",
+  pickerNoMatch: "No matching connectors",
+  pickerDiscover: "Discover connectors",
 };
 
 function makeT(ctx: ClientContext): (key: string) => string {
@@ -2198,6 +2222,308 @@ function CatalogInstallView(props: {
         : h("button", { className: "dmm-btn dmm-btn-primary", disabled: !canInstall, onClick: () => void submit() }, t("catalogInstall"))));
 }
 
+// ---------- 会话输入区连接器快捷选择（conversation.input.left） ----------
+// ➕ 所在的 composer 左排：插头按钮 + 已启用连接器的首字母 chip。
+// 悬停/点击弹出自绘浮层（portal 到 document.body，composer 容器会裁剪 fixed 元素），
+// 浮层里直接开关 DSH 自己的 MCP 服务器；chip = 当前启用中的连接器，点 chip 打开浮层。
+interface PickerRow { sourceKey: string; writable: boolean; server: ServerView; }
+
+// 宿主没有直给的「打开某节设置」服务；设置壳挂在 sidebar.settings 槽位上并公开 store seat
+//（actions.openSection 一次设好 activeId + open）。老壳没有 openSection 时退回
+//「settings.open 命令 + 点同名导航行」，逐字匹配避免子串误点。参照 dsh-codearts 的实现。
+interface SettingsShellHandle {
+  create?: () => { actions?: { openSection?: (id: string) => void; open?: () => void } } | undefined;
+}
+function openPluginSettings(ctx: ClientContext, sectionId: string, label: () => string): boolean {
+  try {
+    const entries = ctx.slots?.entries?.("sidebar.settings") as readonly { store?: SettingsShellHandle }[] | undefined;
+    const openSection = entries?.[0]?.store?.create?.()?.actions?.openSection;
+    if (typeof openSection === "function") {
+      openSection(sectionId);
+      return true;
+    }
+  } catch { /* 换下一条路 */ }
+  let invoke: ((id: string, context?: unknown) => void) | undefined;
+  try {
+    invoke = (ctx.get?.("shortcuts") as { invoke?: (id: string, context?: unknown) => void } | undefined)?.invoke;
+  } catch { /* 软取失效 */ }
+  if (typeof invoke !== "function") return false;
+  try {
+    invoke("settings.open", { modal: null });
+  } catch {
+    return false;
+  }
+  const want = label().trim();
+  if (!want) return true;
+  let clicked = false;
+  for (const delay of [0, 60, 70, 80, 90]) {
+    setTimeout(() => {
+      if (clicked) return;
+      try {
+        const scope = document.querySelector('[data-shortcut-modal="settings"]') ?? document;
+        const row = Array.from(scope.querySelectorAll<HTMLElement>("button"))
+          .find((button) => (button.textContent ?? "").trim() === want);
+        if (row) {
+          clicked = true;
+          row.click();
+        }
+      } catch { /* 再等一轮 */ }
+    }, delay);
+  }
+  return true;
+}
+
+function ComposerConnectorPicker(props: { t: (k: string) => string; onOpenSettings?: () => void }) {
+  const { t, onOpenSettings } = props;
+  const theme = useHostTheme();
+  const [rows, setRows] = useState<PickerRow[] | null>(null);
+  const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [mode, setMode] = useState<"closed" | "hover" | "pinned">("closed");
+  const [busy, setBusy] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [pos, setPos] = useState<{ left: number; bottom: number } | null>(null);
+  const [search, setSearch] = useState("");
+  const [active, setActive] = useState(0);
+  const [showCatalog, setShowCatalog] = useState(false);
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const btnRef = useRef<HTMLButtonElement | null>(null);
+  const popRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const searchRef = useRef<HTMLInputElement | null>(null);
+  const toastSeq = useRef(0);
+  const openTimer = useRef(0);
+  const closeTimer = useRef(0);
+  const open = mode !== "closed";
+
+  const pushToast = useCallback((text: string, err?: boolean) => {
+    const id = ++toastSeq.current;
+    setToasts((list) => [...list, { id, text, err }]);
+    setTimeout(() => setToasts((list) => list.filter((item) => item.id !== id)), 2600);
+  }, []);
+
+  const load = useCallback(async () => {
+    try {
+      const data = await callApi<Snapshot>("/state");
+      const list: PickerRow[] = [];
+      for (const source of data.sources ?? []) {
+        if ((source.group ?? source.key) !== "dsh" || source.error) continue;
+        for (const server of source.servers) list.push({ sourceKey: source.key, writable: source.writable, server });
+      }
+      setRows(list);
+      setSnapshot(data);
+      setLoadError(null);
+    } catch (err) {
+      setLoadError(String(err instanceof Error ? err.message : err));
+    }
+  }, []);
+
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return rows ?? [];
+    return (rows ?? []).filter((row) => `${row.server.name} ${row.server.summary}`.toLowerCase().includes(q));
+  }, [rows, search]);
+  const activeIndex = Math.min(active, Math.max(0, filtered.length - 1));
+
+  useEffect(() => { setActive(0); }, [search, open]);
+  useEffect(() => {
+    if (!open) return;
+    try {
+      listRef.current?.querySelector(".dmm-cp-row.active")?.scrollIntoView({ block: "nearest" });
+    } catch { /* 滚动失败不影响操作 */ }
+  }, [activeIndex, open]);
+  useEffect(() => {
+    if (open && mode === "pinned") searchRef.current?.focus();
+  }, [open, mode]);
+
+  useEffect(() => { void load(); }, [load]);
+  useEffect(() => () => {
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(closeTimer.current);
+  }, []);
+
+  const clearTimers = () => {
+    window.clearTimeout(openTimer.current);
+    window.clearTimeout(closeTimer.current);
+  };
+
+  const show = (target: "hover" | "pinned") => {
+    clearTimers();
+    const rect = btnRef.current?.getBoundingClientRect();
+    if (rect) {
+      const width = 304;
+      setPos({
+        left: Math.min(Math.max(8, rect.left), Math.max(8, window.innerWidth - width - 8)),
+        bottom: window.innerHeight - rect.top + 8,
+      });
+    }
+    setMode(target);
+    setSearch("");
+    void load();
+  };
+
+  const scheduleOpen = () => {
+    window.clearTimeout(closeTimer.current);
+    openTimer.current = window.setTimeout(() => show("hover"), 120);
+  };
+  const scheduleClose = () => {
+    window.clearTimeout(openTimer.current);
+    closeTimer.current = window.setTimeout(() => setMode((cur) => (cur === "hover" ? "closed" : cur)), 250);
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      setMode("closed");
+    };
+    const onDown = (e: MouseEvent) => {
+      const target = e.target as Node;
+      if (popRef.current?.contains(target) || btnRef.current?.contains(target)) return;
+      setMode("closed");
+    };
+    window.addEventListener("keydown", onKey, true);
+    window.addEventListener("mousedown", onDown, true);
+    return () => {
+      window.removeEventListener("keydown", onKey, true);
+      window.removeEventListener("mousedown", onDown, true);
+    };
+  }, [open]);
+
+  const toggle = async (row: PickerRow) => {
+    const key = `${row.sourceKey}/${row.server.name}`;
+    setBusy(key);
+    setActionError(null);
+    try {
+      await callApi(row.server.enabled ? "/disable" : "/enable", {
+        method: "POST", headers: MUTATION_HEADERS,
+        body: JSON.stringify({ source: row.sourceKey, name: row.server.name }),
+      });
+      await load();
+    } catch (err) {
+      setActionError(`${t("toastFailed")}: ${err instanceof Error ? err.message : String(err)}`);
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const enabled = (rows ?? []).filter((row) => row.server.enabled);
+
+  const popup = h("div", {
+    ref: popRef, className: "dmm dmm-cp-pop", "data-theme": theme, role: "menu",
+    style: pos ? { left: pos.left, bottom: pos.bottom } : undefined,
+    onMouseEnter: clearTimers,
+    onMouseLeave: scheduleClose,
+    onKeyDown: (e: React.KeyboardEvent) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActive((value) => Math.min(value + 1, Math.max(0, filtered.length - 1)));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActive((value) => Math.max(value - 1, 0));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        const row = filtered[activeIndex];
+        if (row && row.writable && busy !== `${row.sourceKey}/${row.server.name}`) void toggle(row);
+      }
+    },
+  },
+    h("div", { className: "dmm-cp-pop-head" },
+      icon(ICONS.plug, 13), t("pickerTitle"),
+      h("span", { className: "grow" }),
+      rows ? h("span", { className: "dmm-field-hint" }, `${enabled.length}/${rows.length}`) : null),
+    actionError ? h("div", { className: "dmm-cp-err", style: { padding: "8px 12px", textAlign: "left" } }, actionError) : null,
+    rows && rows.length
+      ? h("div", { className: "dmm-cp-search" },
+          h("input", {
+            ref: searchRef, value: search, placeholder: t("pickerSearch"),
+            onChange: (e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value),
+          }))
+      : null,
+    h("div", { className: "dmm-cp-list", ref: listRef },
+      loadError && rows === null
+        ? [
+            h("div", { className: "dmm-cp-err", key: "e" }, `${t("pickerFailed")}: ${loadError}`),
+            h("div", { style: { textAlign: "center", paddingBottom: 10 }, key: "r" },
+              h("button", {
+                className: "dmm-btn dmm-btn-secondary dmm-btn-sm",
+                onClick: () => { setRows(null); setLoadError(null); void load(); },
+              }, t("catalogRetry"))),
+          ]
+        : rows === null
+          ? [0, 1, 2].map((i) => h("div", { className: "dmm-cp-skel-row", key: i, "aria-hidden": true },
+              h("span", { className: "dmm-skel dmm-skel-icon" }),
+              h("div", { style: { flex: 1 } },
+                h("div", { className: "dmm-skel dmm-skel-line", style: { width: "42%" } }),
+                h("div", { className: "dmm-skel dmm-skel-line", style: { width: "72%", marginTop: 6 } }))))
+          : rows.length === 0
+            ? h("div", { className: "dmm-cp-empty" }, t("pickerEmpty"))
+            : filtered.length === 0
+              ? h("div", { className: "dmm-cp-empty" }, t("pickerNoMatch"))
+              : filtered.map((row, index) => {
+                const rowKey = `${row.sourceKey}/${row.server.name}`;
+                return h("div", {
+                  className: `dmm-cp-row${row.server.enabled ? "" : " off"}${index === activeIndex ? " active" : ""}`,
+                  key: rowKey,
+                  onMouseEnter: () => setActive(index),
+                },
+                  h("div", { className: "dmm-cp-row-main" },
+                    h("div", { className: "dmm-cp-row-name" }, row.server.name, h("span", { className: "dmm-tag gray" }, row.server.transport)),
+                    h("div", { className: "dmm-cp-row-sub", title: row.server.summary }, row.server.summary)),
+                  h("button", {
+                    className: "dmm-switch", role: "switch", "aria-checked": row.server.enabled,
+                    disabled: !row.writable || busy === rowKey,
+                    title: row.server.enabled ? t("switchDisable") : t("switchEnable"),
+                    onClick: () => void toggle(row),
+                  }));
+              })),
+    rows && rows.length ? h("div", { className: "dmm-cp-hint" }, t("pickerHint")) : null,
+    h("div", { className: "dmm-cp-foot" },
+      h("button", {
+        className: "dmm-cp-act",
+        onClick: () => { setMode("closed"); setShowCatalog(true); },
+      }, icon(ICONS.plus, 12), t("pickerDiscover")),
+      onOpenSettings
+        ? h("button", {
+            className: "dmm-cp-act",
+            onClick: () => { setMode("closed"); onOpenSettings(); },
+          },
+            t("pickerOpenSettings"),
+            h("span", { style: { display: "inline-flex", transform: "rotate(-90deg)" } }, icon(ICONS.chevron, 12)))
+        : null));
+
+  const catalogLayer = showCatalog ? createPortal(
+    h("div", { className: "dmm", "data-theme": theme },
+      h("style", null, BOARD_CSS + PICKER_CSS),
+      h(CatalogModal, {
+        t, sources: snapshot?.sources ?? [], refresh: load, toast: pushToast,
+        close: () => setShowCatalog(false),
+      }),
+      toasts.length
+        ? h("div", { className: "dmm-toast-wrap" }, toasts.map((item) => h("div", { key: item.id, className: `dmm-toast${item.err ? " err" : ""}` }, item.text)))
+        : null),
+    document.body) : null;
+
+  return h("span", { className: "dmm dmm-cp", "data-theme": theme },
+    h("style", null, BOARD_CSS + PICKER_CSS),
+    h("button", {
+      ref: btnRef, type: "button",
+      className: `dmm-cp-btn${open ? " on" : ""}`,
+      title: enabled.length ? `${t("pickerTitle")} · ${enabled.length}` : t("pickerTitle"),
+      onMouseEnter: scheduleOpen,
+      onMouseLeave: scheduleClose,
+      onClick: () => { clearTimers(); if (mode === "pinned") setMode("closed"); else show("pinned"); },
+    },
+      icon(ICONS.plug, 15),
+      enabled.length
+        ? h("span", { className: "dmm-cp-badge", "aria-hidden": true }, enabled.length > 99 ? "99+" : String(enabled.length))
+        : null),
+    open && pos ? createPortal(popup, document.body) : null,
+    catalogLayer);
+}
+
 // ---------- 入口 ----------
 const NS = "mcp-manager";
 
@@ -2251,6 +2577,26 @@ export function apply(ctx: ClientContext) {
       });
     } catch (reason) {
       console.warn("mcp-manager: inject settings.section.icon failed:", reason);
+    }
+
+    // 会话输入区左排（➕ 旁边）：连接器快捷选择；老宿主没声明该槽位时自动跳过
+    try {
+      ctx.slots.inject("conversation.input.left", () => {
+        try {
+          return ctx.slots!.register(
+            { name: "conversation.input.left", id: "mcp-manager-connectors", order: 90, label: () => t("pickerTitle"), locale: NS },
+            () => h(ComposerConnectorPicker, {
+              t,
+              onOpenSettings: () => { openPluginSettings(ctx, "mcp-manager", () => t("title")); },
+            }),
+          );
+        } catch (reason) {
+          console.warn("mcp-manager: register conversation.input.left failed:", reason);
+          return () => {};
+        }
+      });
+    } catch (reason) {
+      console.warn("mcp-manager: inject conversation.input.left failed:", reason);
     }
   }
 }

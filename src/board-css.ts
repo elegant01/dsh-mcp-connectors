@@ -525,3 +525,90 @@ export const BOARD_CSS = `
   .dmm * { transition:none !important; animation:none !important; }
 }
 `;
+
+/* ---------- 会话输入区连接器快捷选择（conversation.input.left） ----------
+   挂在 composer 左排：覆盖 .dmm 外壳的背景/最小高度，只保留变量与控件样式。
+   弹层 portal 到 document.body（composer 容器会裁剪 fixed 浮层），自带 .dmm 作用域。 */
+export const PICKER_CSS = `
+.dmm.dmm-cp {
+  background:transparent; min-height:0;
+  display:inline-flex; align-items:center; gap:3px;
+  font-size:12px; line-height:18px;
+}
+.dmm-cp-btn {
+  width:28px; height:28px; flex:none; padding:0; position:relative;
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius:8px; border:1px solid transparent; background:transparent;
+  color:var(--text-secondary); cursor:pointer;
+  transition:background .12s var(--ease), color .12s var(--ease);
+}
+.dmm-cp-btn:hover, .dmm-cp-btn.on { background:var(--bg-primary-hover); color:var(--text-primary); }
+.dmm-cp-badge {
+  position:absolute; top:-2px; right:-4px; min-width:14px; height:14px; padding:0 3px;
+  display:inline-flex; align-items:center; justify-content:center;
+  border-radius:7px; border:1.5px solid var(--bg-full);
+  background:var(--dmm-accent); color:#fff;
+  font-size:9px; font-weight:700; line-height:1;
+  pointer-events:none;
+}
+
+.dmm.dmm-cp-pop {
+  position:fixed; z-index:1000; width:304px; max-height:calc(100vh - 16px); min-height:0;
+  display:flex; flex-direction:column;
+  background:var(--bg-full); border:1px solid var(--border-table);
+  border-radius:12px; box-shadow:0 10px 32px rgba(10,10,10,.16);
+  overflow:hidden; font-size:13px;
+  /* 浮层滚动条契约（ui-theme styles/scrollbar.css）：抬升面的 thumb 重绑到 l2，
+     全局 ::-webkit-scrollbar 规则负责画 5px 细条与配色 */
+  --dsh-scrollbar-thumb: var(--dsw-alias-scrollbar-bg-l2, rgba(0,0,0,.2));
+  --dsh-scrollbar-thumb-hover: var(--dsw-alias-scrollbar-hover-l2, rgba(0,0,0,.34));
+}
+.dmm-cp-pop-head {
+  padding:10px 12px 8px; display:flex; align-items:center; gap:6px;
+  font-size:12px; font-weight:600; color:var(--text-secondary);
+  border-bottom:1px solid var(--border-table);
+}
+.dmm-cp-pop-head .grow { flex:1; }
+.dmm-cp-search { padding:8px 10px 2px; }
+.dmm-cp-search input {
+  width:100%; height:28px; padding:0 8px;
+  border:1px solid var(--border-button-default); border-radius:8px;
+  background:var(--bg-secondary-default); color:var(--text-primary);
+  font-family:inherit; font-size:12px; outline:none;
+  transition:border-color .12s var(--ease), background .12s var(--ease);
+}
+.dmm-cp-search input:focus { border-color:var(--border-focus-ring); background:var(--bg-full); }
+.dmm-cp-search input::placeholder { color:var(--text-tertiary); }
+/* 4 行封顶：一行 55px + 列表上下内边距 12px；再多就上下滚动 */
+.dmm-cp-list { overflow-y:auto; padding:6px; max-height:232px; }
+.dmm-cp-row { display:flex; align-items:center; gap:8px; padding:7px 8px; border-radius:8px; }
+.dmm-cp-row:hover, .dmm-cp-row.active { background:var(--bg-primary-hover); }
+.dmm-cp-row-main { flex:1; min-width:0; }
+.dmm-cp-row-name {
+  font-size:13px; color:var(--text-primary);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  display:flex; align-items:center; gap:6px;
+}
+.dmm-cp-row-sub {
+  font-size:11px; color:var(--text-tertiary); margin-top:1px;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.dmm-cp-row.off .dmm-cp-row-name { color:var(--text-secondary); }
+.dmm-cp-empty, .dmm-cp-err { padding:18px 14px; font-size:12px; color:var(--text-secondary); text-align:center; }
+.dmm-cp-err { color:var(--text-error); }
+.dmm-cp-hint {
+  padding:7px 12px; font-size:11px; color:var(--text-tertiary);
+  border-top:1px solid var(--border-table);
+}
+.dmm-cp-foot { display:flex; align-items:stretch; border-top:1px solid var(--border-table); }
+.dmm-cp-act {
+  flex:1; display:flex; align-items:center; justify-content:center; gap:5px;
+  padding:9px 8px; border:0; background:transparent; color:var(--accent-600);
+  font-family:inherit; font-size:12px; cursor:pointer;
+  transition:background .12s var(--ease);
+}
+.dmm-cp-act + .dmm-cp-act { border-left:1px solid var(--border-table); }
+.dmm-cp-act:hover { background:var(--bg-primary-hover); }
+.dmm[data-theme="dark"] .dmm-cp-act { color:var(--accent-300); }
+.dmm-cp-skel-row { display:flex; align-items:center; gap:8px; padding:9px 8px; }
+`;
