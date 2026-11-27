@@ -488,7 +488,8 @@ export const BOARD_CSS = `
   background:var(--bg-secondary-default);
 }
 .dmm-catalog-more { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:10px; }
-.dmm-modal-head .dmm-segmented { flex-wrap:wrap; }
+.dmm-modal-head .dmm-segmented { flex-wrap:nowrap; overflow-x:auto; min-width:0; max-width:100%; scrollbar-width:thin; }
+.dmm-modal-head .dmm-segmented button { flex:none; white-space:nowrap; }
 .dmm-rank-card {
   display:flex; gap:12px; align-items:flex-start;
   padding:12px; border:1px solid var(--border-table); border-radius:var(--r-ctl);
