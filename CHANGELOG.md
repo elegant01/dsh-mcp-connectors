@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. Format follows [Keep a Changelog](https://keepachangelog.com/), versions use [SemVer](https://semver.org/).
 
+## [1.0.2] - 2026-11-27
+
+### Fixed
+
+- In dark mode, brand icons (Codex, CodeBuddy, etc.) turned into solid white blocks: the DSH whale icon's inlined dark-mode `<style>` leaked into the whole page and painted every SVG `path` white. It now uses `currentColor` to follow the host theme.
+- The connector catalog's tab bar no longer wraps to a second line when it overflows; it scrolls horizontally instead.
+- The "Online discovery" and "mcp.so" tabs no longer flash into view and then hide when offline: reachability is probed as soon as the plugin loads (cached for 60s), and the two tabs are not rendered until availability is confirmed (a skeleton is shown while probing).
+
 ## [1.0.1] - 2026-11-27
 
 ### Added
